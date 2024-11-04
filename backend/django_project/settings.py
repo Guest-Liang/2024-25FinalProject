@@ -14,7 +14,14 @@ from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STORAGE_DIR = os.path.join(BASE_DIR, 'storage')
+TRANSIT_DIR = os.path.join(BASE_DIR, 'transit')
+PIC_DIR = os.path.join(BASE_DIR, 'pic')
+
+os.makedirs(STORAGE_DIR, exist_ok=True)
+os.makedirs(TRANSIT_DIR, exist_ok=True)
+os.makedirs(PIC_DIR, exist_ok=True)
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +33,7 @@ SECRET_KEY = "django-insecure-lf3ivf&47h1s5z6fsc+!7b99na6akz1dmodr7p!3c=2tj6ow=v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
