@@ -10,7 +10,7 @@ defineProps<{
     <h3>
       Welcome to the system!
       <br />
-      You can view operations and choose one below.
+      You can select an event below:
     </h3>
   </div>
 </template>

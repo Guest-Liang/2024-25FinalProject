@@ -18,7 +18,12 @@ const router = createRouter({
       path: '/decryption',
       name: 'decryption',
       component: () => import('../views/DecryptionView.vue'),
-    }
+    },
+    {
+      path: '/tools',
+      name: 'tools',
+      component: () => import('../views/ToolsView.vue'),
+    },
   ],
 })
 

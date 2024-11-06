@@ -5,7 +5,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.http import JsonResponse
 from django.conf import settings
 from datetime import datetime
-import os, base64
+import os, base64, random
 # Personal imports
 import LSB, En_Decryption
 
@@ -54,40 +54,55 @@ class EncryptView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
+
+        isUseCustomImg = request.data.get('isUseCustomImg')
+        CustomImgPath = os.path.join(settings.TRANSIT_DIR, 'custom.png')
+        if isUseCustomImg is not None:
+            with open(CustomImgPath, 'wb') as des:
+                for chunk in isUseCustomImg.chunks():
+                    des.write(chunk)
+
         # Check if file is provided
-        if 'file' not in request.data:
+        if 'file' not in request.data and 'file[]' not in request.data:
+            os.remove(CustomImgPath)
             return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
 
-        File = request.data['file']
+        Files = request.data.getlist('file')
         Timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        results = []
 
-        # Save file to TRANSIT_DIR and keep original extension
-        OriginalFileName = File.name
-        FilePath = os.path.join(settings.TRANSIT_DIR, OriginalFileName)
-        
-        with open(FilePath, 'wb') as des:
-            for chunk in File.chunks():
-                des.write(chunk)
-        
-        try:
-            # Encrypt the file
-            EncryptedInfo = En_Decryption.EncryptFile(FilePath)
-
-            # Encode the encrypted info into an image
-            ImagePath = os.path.join(settings.PIC_DIR, '3.png')
-            OutputImagePath = os.path.join(settings.TRANSIT_DIR, f"EncodedImage_{Timestamp}.png")
-            LSB.LSB_Encode(ImagePath, OutputImagePath, EncryptedInfo)
+        for i,File in enumerate(Files):
+            FilePath = os.path.join(settings.TRANSIT_DIR, File.name)
             
-            result = {
-                "status": "success",
-                "EncodedImagePath": OutputImagePath
-            }
-            os.remove(FilePath)
-            return JsonResponse({"message": "File encrypted and saved successfully", "result": result})
+            # Save each file to the specified directory
+            with open(FilePath, 'wb') as des:
+                for chunk in File.chunks():
+                    des.write(chunk)
 
-        except Exception as e:
+            try:
+                # Encrypt the file
+                EncryptedInfo = En_Decryption.EncryptFile(FilePath)
+
+                # Encode the encrypted info into an image
+                ImagePath = os.path.join(settings.PIC_DIR, random.choice(os.listdir(settings.PIC_DIR))) if isUseCustomImg == None else CustomImgPath
+                OutputImagePath = os.path.join(settings.TRANSIT_DIR, f"EncodedImage_{Timestamp}_{i}.png")
+                LSB.LSB_Encode(ImagePath, OutputImagePath, EncryptedInfo)
+                
+                results.append({
+                    "status": "success",
+                    "EncodedImagePath": OutputImagePath
+                })
+
+            except Exception as e:
+                os.remove(FilePath)
+                print("Error: ", e)
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                                
             os.remove(FilePath)
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if os.path.exists(CustomImgPath):
+            os.remove(CustomImgPath)
+        return JsonResponse({"message": "File encrypted and saved successfully", "result": results}, status=status.HTTP_200_OK)
     
 
 class EchoView(APIView):
