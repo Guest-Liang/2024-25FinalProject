@@ -1,5 +1,6 @@
 from PIL import Image
-import base64, datetime
+import base64, logging
+logger =  logging.getLogger(__name__)
 
 
 def LSB_Encode(image_path, output_path, secret_message):
@@ -33,7 +34,7 @@ def LSB_Encode(image_path, output_path, secret_message):
             break
 
     encoded.save(output_path)
-    print(f"[{datetime.datetime.now().strftime('%Y%m%d %H:%M:%S')}]Message encoded into {output_path}")
+    logger.error(f"Message encoded into {output_path}")
 
 
 def LSB_Decode(image_path):

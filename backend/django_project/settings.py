@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from pathlib import Path
+import logging
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -136,3 +136,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
+
+# logging settings
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(filename)s | %(module)s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)

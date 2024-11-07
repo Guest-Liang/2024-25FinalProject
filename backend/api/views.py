@@ -2,59 +2,66 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.conf import settings
 from datetime import datetime
-import os, base64, random
+import os, base64, random, urllib.parse, mimetypes, logging, pdb
+logger = logging.getLogger(__name__)
 # Personal imports
 import LSB, En_Decryption
+from .responses import CustomResponse
 
 class DecryptView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         # Check if file is provided
-        if 'file' not in request.data:
-            return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
+        if 'file' not in request.data and 'file[]' not in request.data:
+            return CustomResponse(error="No file provided", status=status.HTTP_400_BAD_REQUEST)
 
-        File = request.data['file']
+        Files = request.data.getlist('file')
         Timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        Results = []
         
-        # Save file to TRANSIT_DIR
-        FilePath = os.path.join(settings.TRANSIT_DIR, f"Uploaded_{Timestamp}.png")
-        with open(FilePath, 'wb') as des:
-            for chunk in File.chunks():
-                des.write(chunk)
+        for i, File in enumerate(Files):
+            
+            # Save file to TRANSIT_DIR
+            FilePath = os.path.join(settings.TRANSIT_DIR, f"Uploaded_{Timestamp}.png")
+            with open(FilePath, 'wb') as des:
+                for chunk in File.chunks():
+                    des.write(chunk)
 
-        try:
-            # Decode the encrypted information from the image
-            EncryptedInfo = LSB.LSB_Decode(FilePath)
+            try:
+                # Decode the encrypted information from the image
+                EncryptedInfo = LSB.LSB_Decode(FilePath)
+                
+                # Decrypt the file data
+                DecryptedData, FileName = En_Decryption.DecryptFile(EncryptedInfo)
             
-            # Decrypt the file data
-            DecryptedData, FileName = En_Decryption.DecryptFile(EncryptedInfo)
+                # Save the decrypted file to TRANSIT_DIR
+                OutputPath = os.path.join(settings.TRANSIT_DIR, f"{Timestamp}_{base64.b64decode(FileName).decode('utf-8')}")
+                with open(OutputPath, 'wb') as OutputFile:
+                    OutputFile.write(DecryptedData)
             
-            # Save the decrypted file to TRANSIT_DIR
-            OutputPath = os.path.join(settings.TRANSIT_DIR, f"{Timestamp}_{base64.b64decode(FileName).decode('utf-8')}")
-            with open(OutputPath, 'wb') as OutputFile:
-                OutputFile.write(DecryptedData)
-            
-            result = {
-                "status": "success",
-                "DecryptedFilePath": OutputPath
-            }
-            os.remove(FilePath)
-            return JsonResponse({"message": "File processed successfully", "result": result})
+                Results.append({
+                    'status': "success",
+                    "DecryptedFilePath": OutputPath
+                })
 
-        except Exception as e:
+            except Exception as e:
+                os.remove(FilePath)
+                logger.error("Error: ",e)
+                return CustomResponse(error=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
             os.remove(FilePath)
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return CustomResponse(results=Results, message="File decrypted successfully", status=status.HTTP_200_OK)
 
 
 class EncryptView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
-
         isUseCustomImg = request.data.get('isUseCustomImg')
         CustomImgPath = os.path.join(settings.TRANSIT_DIR, 'custom.png')
         if isUseCustomImg is not None:
@@ -65,11 +72,11 @@ class EncryptView(APIView):
         # Check if file is provided
         if 'file' not in request.data and 'file[]' not in request.data:
             os.remove(CustomImgPath)
-            return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
+            return CustomResponse(error="No file provided", status=status.HTTP_400_BAD_REQUEST)
 
         Files = request.data.getlist('file')
         Timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        results = []
+        Results = []
 
         for i,File in enumerate(Files):
             FilePath = os.path.join(settings.TRANSIT_DIR, File.name)
@@ -88,28 +95,43 @@ class EncryptView(APIView):
                 OutputImagePath = os.path.join(settings.TRANSIT_DIR, f"EncodedImage_{Timestamp}_{i}.png")
                 LSB.LSB_Encode(ImagePath, OutputImagePath, EncryptedInfo)
                 
-                results.append({
+                Results.append({
                     "status": "success",
                     "EncodedImagePath": OutputImagePath
                 })
 
             except Exception as e:
                 os.remove(FilePath)
-                print("Error: ", e)
-                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                logger.error("Error: ", e)
+                return CustomResponse(error=str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                                 
             os.remove(FilePath)
 
         if os.path.exists(CustomImgPath):
             os.remove(CustomImgPath)
-        return JsonResponse({"message": "File encrypted and saved successfully", "result": results}, status=status.HTTP_200_OK)
+        return CustomResponse(results=Results, message="File encrypted and saved successfully", status=status.HTTP_200_OK)
+
     
+class DownloadView(APIView):
+    def get(self, request, file_name):
+        FilePath = os.path.join(settings.TRANSIT_DIR, file_name)
+
+        if os.path.exists(FilePath):
+            logger.info(f"Downloading file: {FilePath}")
+            content_type, _ = mimetypes.guess_type(FilePath)
+            response = FileResponse(open(FilePath, 'rb'), content_type=content_type)
+            response['Content-Disposition'] = f'attachment; filename="{urllib.parse.quote(file_name)}"'
+            return response
+        else:
+            logger.error(f"File not found: {FilePath}")
+            return CustomResponse(error="File not found", status=status.HTTP_404_NOT_FOUND)
+
 
 class EchoView(APIView):
     def post(self, request, *args, **kwargs):
-        input_text = request.data.get('text', None)
-        if input_text is None:
+        InputText = request.data.get('text', None)
+        if InputText is None:
             return Response({"error": "No text provided"}, status=status.HTTP_400_BAD_REQUEST)
-        reversed_text = input_text[::-1]
-        return Response({"original_text": input_text, "reversed_text": reversed_text}, status=status.HTTP_200_OK)
+        ReversedText = InputText[::-1]
+        return Response({"Original Text": InputText, "Reversed Text": ReversedText}, status=status.HTTP_200_OK)
     

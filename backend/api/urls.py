@@ -6,4 +6,5 @@ urlpatterns = [
     path('decrypt/', DecryptView.as_view(), name='decrypt'),
     path('encrypt/', EncryptView.as_view(), name='encrypt'),
     path('echo/', EchoView.as_view(), name='echo'),
+    path('download/<str:file_name>/', DownloadView.as_view(), name='DownloadFile'),
 ]

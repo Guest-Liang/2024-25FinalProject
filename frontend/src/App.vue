@@ -26,6 +26,7 @@ import Hello from './components/Hello.vue'
 header {
   line-height: 1.5;
   max-height: 100vh;
+  min-width: 42vw;
 }
 
 .logo {

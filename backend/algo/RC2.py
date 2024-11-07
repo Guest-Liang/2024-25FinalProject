@@ -1,9 +1,9 @@
 from cryptography.hazmat.primitives.ciphers import Cipher, modes
 from cryptography.hazmat.decrepit.ciphers import algorithms
 from cryptography.hazmat.backends import default_backend
-import os
+import os, logging
 from .PKCS5 import *
-
+logger = logging.getLogger(__name__)
 
 def RC2_Encrypt(data, key):
     if len(key) != 16:
@@ -35,9 +35,9 @@ def RC2_Decrypt(encrypted_data, key):
         return PKCS5_Unpad(decrypted_data)
 
     except ValueError as e:
-        print(f"ValueError: {e}")
+        logger.error(f"ValueError: {e}")
     except Exception as e:
-        print(f"An error occurred during RC2 decryption: {e}")  # All other exceptions
+        logger.error(f"An error occurred during RC2 decryption: {e}")  # All other exceptions
         return None
 
 
