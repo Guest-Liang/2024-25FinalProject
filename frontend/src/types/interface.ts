@@ -9,7 +9,6 @@ export interface EncryptResult {
   EncodedImagePath: string
 }
 
-
 export interface DecodedFileResponse {
   message: string
   results: DecryptResult[]
@@ -19,7 +18,6 @@ export interface DecryptResult {
   status: string
   DecryptedFilePath: string
 }
-
 
 export interface DownloadLink {
   name: string

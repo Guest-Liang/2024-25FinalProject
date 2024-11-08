@@ -15,8 +15,16 @@
         accept="*"
       >
         <i class="el-icon-upload"></i>
-        <div class="el-upload__text">{{ (encryptFileName === null) ? 'Choose files that needs to be encrypted' : 'List of chosen files' }}</div>
-        <div class="el-upload__tip">{{ (encryptFileName === null) ? 'Support all file type' : 'Files are ready' }}</div>
+        <div class="el-upload__text">
+          {{
+            encryptFileName === null
+              ? 'Choose files that needs to be encrypted'
+              : 'List of chosen files'
+          }}
+        </div>
+        <div class="el-upload__tip">
+          {{ encryptFileName === null ? 'Support all file type' : 'Files are ready' }}
+        </div>
       </el-upload>
 
       <el-upload
@@ -34,7 +42,11 @@
       >
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">{{ customImageName || 'Select a custom image' }}</div>
-        <div class="el-upload__tip">{{ (customImageName === null) ? 'Only PNG images are supported' : 'Already selected 1 image!'}}</div>
+        <div class="el-upload__tip">
+          {{
+            customImageName === null ? 'Only PNG images are supported' : 'Already selected 1 image!'
+          }}
+        </div>
       </el-upload>
     </div>
 
@@ -54,10 +66,10 @@
 <script setup lang="ts">
 import { ref, toRaw } from 'vue'
 import { ElLoading, ElMessage } from 'element-plus'
-import type { EncryptResult, DownloadLink} from '@/types/interface';
-import { BACKEND_API } from '@/types/config';
+import type { EncryptResult, DownloadLink } from '@/types/interface'
+import { BACKEND_API } from '@/types/config'
 
-const downloadLinks = ref<DownloadLink[]>([]);
+const downloadLinks = ref<DownloadLink[]>([])
 
 const encryptFileList = ref<File[]>([])
 const customImageList = ref<File[]>([])
@@ -70,13 +82,12 @@ const handleCustomImageChange = (fileList: { raw: File }) => {
 }
 
 const handleEncryptFileChange = (fileList: { raw: File }) => {
-  encryptFileList.value.push(fileList.raw) 
+  encryptFileList.value.push(fileList.raw)
   encryptFileName.value = fileList.raw.name
 }
 
-
 const beforeUpload = (file: File) => {
-  const isPNG = file.type === 'image/png';
+  const isPNG = file.type === 'image/png'
   const isValidSize = file.size / 1024 / 1024 < 10 && file.size / 1024 > 200 // Limit to 200KB-10MB
   if (!isValidSize) {
     ElMessage.error('Custom image size cannot exceed 10MB')
@@ -84,7 +95,7 @@ const beforeUpload = (file: File) => {
   if (!isPNG) {
     ElMessage.error('Only PNG images are supported')
   }
-  return isValidSize && isPNG;
+  return isValidSize && isPNG
 }
 
 const uploadFiles = async () => {
@@ -105,7 +116,7 @@ const uploadFiles = async () => {
   }
 
   const formData = new FormData()
-  RawEncryptFileList.forEach(file => {
+  RawEncryptFileList.forEach((file) => {
     formData.append('file', file)
   })
 
@@ -128,7 +139,7 @@ const uploadFiles = async () => {
         return {
           name: fileName,
           url: `http://${BACKEND_API}/api/download/${fileName}`,
-          originalName: originalFile.name
+          originalName: originalFile.name,
         }
       })
       ElMessage.success('Files uploaded successfully!')
@@ -163,7 +174,7 @@ const uploadFiles = async () => {
 }
 
 .upload-component {
-  transition: height 0.2s; 
+  transition: height 0.2s;
   margin: 0 10px;
   flex: 1;
 }
@@ -175,6 +186,5 @@ const uploadFiles = async () => {
 }
 
 @media (max-width: 1024px) {
-
 }
 </style>

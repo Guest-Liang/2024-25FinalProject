@@ -20,24 +20,15 @@
       </el-upload>
     </div>
     <el-button type="primary" round @click="calculateHash">Calculate Hash</el-button>
-    
+
     <div class="hash-table-container" v-if="hashResults.length > 0">
       <el-table :data="hashResults" border stripe height="72vh" style="width: 100%">
-        <el-table-column
-          prop="fileName"
-          label="File Name"
-          min-width="17%"
-        />
-        <el-table-column
-          prop="hash"
-          label="SHA-256 Hash"
-          min-width="83%"
-        />
+        <el-table-column prop="fileName" label="File Name" min-width="17%" />
+        <el-table-column prop="hash" label="SHA-256 Hash" min-width="83%" />
       </el-table>
     </div>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -45,13 +36,11 @@ import CryptoJS from 'crypto-js'
 import { ElMessage } from 'element-plus'
 
 const fileList = ref<File[]>([])
-const hashResults = ref<{ fileName: string; hash: string, raw: File }[]>([])
-
+const hashResults = ref<{ fileName: string; hash: string; raw: File }[]>([])
 
 const handleFileChange = (file: { raw: File }) => {
   hashResults.value.push({ fileName: file.raw.name, hash: '', raw: file.raw })
 }
-
 
 const calculateHash = async () => {
   for (let i = 0; i < hashResults.value.length; i++) {
@@ -71,7 +60,7 @@ const getFileHash = (file: File): Promise<string> => {
         .toUpperCase()
       resolve(hash)
     }
-    reader.readAsArrayBuffer(file) 
+    reader.readAsArrayBuffer(file)
   })
 }
 
@@ -93,7 +82,7 @@ const beforeUpload = (file: File) => {
 }
 
 .el-upload-dragger {
-  padding: 10px 10px 10px 10px; 
+  padding: 10px 10px 10px 10px;
 }
 
 .file-container {

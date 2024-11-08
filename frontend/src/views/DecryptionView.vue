@@ -2,7 +2,7 @@
   <div class="decryption">
     <h1>This is DecryptionView page</h1>
     <div class="upload-container">
-      <el-upload 
+      <el-upload
         action=""
         class="upload-component"
         :drag="true"
@@ -16,8 +16,16 @@
         accept="image/png"
       >
         <i class="el-icon-upload"></i>
-        <div class="el-upload__text">{{ (customImageList.length === 0) ? 'Select the images you want to decrypt' : 'List of chosen files' }}</div>
-        <div v-if="customImageList.length === 0" class="el-upload__tip">Only PNG images are supported</div>
+        <div class="el-upload__text">
+          {{
+            customImageList.length === 0
+              ? 'Select the images you want to decrypt'
+              : 'List of chosen files'
+          }}
+        </div>
+        <div v-if="customImageList.length === 0" class="el-upload__tip">
+          Only PNG images are supported
+        </div>
       </el-upload>
     </div>
     <el-button type="primary" round @click="uploadFiles">Upload to Server</el-button>
@@ -36,10 +44,10 @@
 <script setup lang="ts">
 import { ref, toRaw } from 'vue'
 import { ElLoading, ElMessage } from 'element-plus'
-import type { DecryptResult, DownloadLink} from '@/types/interface';
-import { BACKEND_API } from '@/types/config';
+import type { DecryptResult, DownloadLink } from '@/types/interface'
+import { BACKEND_API } from '@/types/config'
 
-const downloadLinks = ref<DownloadLink[]>([]);
+const downloadLinks = ref<DownloadLink[]>([])
 const customImageList = ref<File[]>([])
 
 const handleImageChange = (fileList: { raw: File }) => {
@@ -47,15 +55,14 @@ const handleImageChange = (fileList: { raw: File }) => {
 }
 
 const handleImageRemove = (file: File) => {
-  const index = customImageList.value.findIndex(item => item.name === file.name)
+  const index = customImageList.value.findIndex((item) => item.name === file.name)
   if (index !== -1) {
     customImageList.value.splice(index, 1)
   }
 }
 
-
 const beforeUpload = (file: File) => {
-  const isPNG = file.type === 'image/png';
+  const isPNG = file.type === 'image/png'
   const isValidSize = file.size / 1024 / 1024 < 10 && file.size / 1024 > 200 // Limit to 200KB-10MB
   if (!isValidSize) {
     ElMessage.error('Custom image size cannot exceed 10MB')
@@ -63,7 +70,7 @@ const beforeUpload = (file: File) => {
   if (!isPNG) {
     ElMessage.error('Only PNG images are supported')
   }
-  return isValidSize && isPNG;
+  return isValidSize && isPNG
 }
 
 const uploadFiles = async () => {
@@ -82,7 +89,7 @@ const uploadFiles = async () => {
   }
 
   const formData = new FormData()
-  RawCustomImageList.forEach(file => {
+  RawCustomImageList.forEach((file) => {
     formData.append('file', file)
   })
 
@@ -99,7 +106,7 @@ const uploadFiles = async () => {
         const fileName = item.DecryptedFilePath.split('\\').pop()
         return {
           name: fileName,
-          url: `http://${BACKEND_API}/api/download/${fileName}`
+          url: `http://${BACKEND_API}/api/download/${fileName}`,
         }
       })
       ElMessage.success('Files uploaded successfully!')
@@ -145,6 +152,5 @@ const uploadFiles = async () => {
 }
 
 @media (max-width: 1024px) {
-
 }
 </style>
