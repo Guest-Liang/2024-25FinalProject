@@ -12,9 +12,15 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import logging
 import os
+import sys
+import shutil
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 STORAGE_DIR = os.path.join(BASE_DIR, 'storage')
 TRANSIT_DIR = os.path.join(BASE_DIR, 'transit')
 PIC_DIR = os.path.join(BASE_DIR, 'pic')
@@ -22,6 +28,15 @@ PIC_DIR = os.path.join(BASE_DIR, 'pic')
 os.makedirs(STORAGE_DIR, exist_ok=True)
 os.makedirs(TRANSIT_DIR, exist_ok=True)
 os.makedirs(PIC_DIR, exist_ok=True)
+
+# Copy pic files to excutable directory
+if getattr(sys, 'frozen', False):
+    PicDir = os.path.join(sys._MEIPASS, 'pic') # type: ignore
+    if os.path.exists(PicDir):
+        for filename in os.listdir(PicDir):
+            SourcePath = os.path.join(PicDir, filename)
+            if os.path.isfile(SourcePath):
+                shutil.copy2(SourcePath, PIC_DIR)
 
 
 # Quick-start development settings - unsuitable for production

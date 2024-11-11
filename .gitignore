@@ -2,6 +2,11 @@
 config
 
 **/__pycache__
+**/node_modules
+
+/frontend/build
 
 /backend/Anaconda PowerShell Prompt.lnk
 /backend/transit/testfile
+/backend/build
+/backend/dist

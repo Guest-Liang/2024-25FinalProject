@@ -160,7 +160,6 @@ const uploadFiles = async () => {
 .encryption {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
@@ -180,9 +179,6 @@ const uploadFiles = async () => {
 }
 
 @media (min-width: 1024px) {
-  .encryption {
-    min-height: 100vh;
-  }
 }
 
 @media (max-width: 1024px) {

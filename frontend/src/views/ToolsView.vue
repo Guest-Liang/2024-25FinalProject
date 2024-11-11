@@ -22,9 +22,9 @@
     <el-button type="primary" round @click="calculateHash">Calculate Hash</el-button>
 
     <div class="hash-table-container" v-if="hashResults.length > 0">
-      <el-table :data="hashResults" border stripe height="72vh" style="width: 100%">
-        <el-table-column prop="fileName" label="File Name" min-width="17%" />
-        <el-table-column prop="hash" label="SHA-256 Hash" min-width="83%" />
+      <el-table :data="hashResults" border stripe>
+        <el-table-column prop="fileName" label="File Name" min-width="20%" />
+        <el-table-column prop="hash" label="SHA-256 Hash" min-width="80%" />
       </el-table>
     </div>
   </div>
@@ -77,7 +77,6 @@ const beforeUpload = (file: File) => {
 .tools {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
@@ -105,20 +104,22 @@ el-button {
 }
 
 .hash-table-container {
-  max-height: 80vh;
-  overflow-y: auto;
-  width: 45vw;
+  max-height: 60vh;
+  width: 100%;
+  min-width: 200px;
   padding-top: 10px;
 }
 
 .el-table {
   margin-top: 10px;
   margin: 0;
+  height: 55vh;
+  width: 100%;
 }
 
 @media (min-width: 1024px) {
-  .tools {
-    min-height: 100vh;
-  }
+}
+
+@media (max-width: 1024px) {
 }
 </style>

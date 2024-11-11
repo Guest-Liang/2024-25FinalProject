@@ -127,7 +127,6 @@ const uploadFiles = async () => {
 .decryption {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
@@ -146,9 +145,6 @@ const uploadFiles = async () => {
 }
 
 @media (min-width: 1024px) {
-  .decryption {
-    min-height: 100vh;
-  }
 }
 
 @media (max-width: 1024px) {
