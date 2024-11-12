@@ -1,9 +1,26 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import path from 'path'
+import { execFile, exec } from 'child_process'
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname)
+const killDjangoProcess = () => {
+  exec('taskkill -F -IM DjangoRestfulAPI.exe', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`[killDjangoProcess] Error killing Django process: ${error}`)
+      return
+    }
+    if (stderr) {
+      console.error(`[killDjangoProcess] stderr: ${stderr}`)
+      return
+    }
+    console.log(`[killDjangoProcess] stdout: ${stdout}`)
+  })
+}
 
+const __dirname = path.dirname(new URL(import.meta.url).pathname).slice(1)
+
+let isDev = false
 let win
+let djangoProcess
 
 function createWindow() {
   win = new BrowserWindow({
@@ -17,8 +34,41 @@ function createWindow() {
     }
   })
 
-  // win.loadURL('http://localhost:5173') // dev, hot reload
-  win.loadFile('./dist/index.html') // prod
+  // sometimes use dev mode
+  if (isDev) {
+    const djangoExePath = path.join(__dirname, '../backend/dist/DjangoRestfulAPI.exe')
+
+    djangoProcess = execFile(djangoExePath, ['runserver', '--noreload'], (error, stdout, stderr) => {
+      if (error) {
+        console.error(`[django internal server error] ${error}`)
+        return
+      }
+      if (stderr) {
+        console.error(`[django internal server stderr] ${stderr}`)
+        return
+      }
+      console.log(`[django internal server stdout] ${stdout}`)
+    })
+
+    djangoProcess.stdout.on('data', (stdout) => {
+      console.log(`[Django server stdout] ${stdout.toString()}`)
+    })
+
+    djangoProcess.stderr.on('data', (stderr) => {
+      console.error(`[Django server stderr] ${stderr.toString()}`)
+    })
+
+    djangoProcess.on('error', (err) => {
+      console.error(`[Django server error] ${err}`)
+    })
+
+    djangoProcess.on('exit', (code) => {
+      console.log(`Django backend process exited with code ${code}`)
+    })
+  }
+
+  win.loadURL('http://localhost:5173') // dev, hot reload
+  // win.loadFile('./dist/index.html') // prod
   win.on('closed', () => {
     win = null
   })
@@ -123,13 +173,37 @@ function createWindow() {
     }
   ]
 
-  // 生成并设置菜单
   const menu = Menu.buildFromTemplate(menuTemplate)
   Menu.setApplicationMenu(menu)
 }
 
 app.whenReady().then(() => {
   createWindow()
+  
+  win.on('closed', () => {
+    if (djangoProcess) {
+      djangoProcess.kill()
+      console.log('[win.onclose] Django backend process killed.')
+    }
+    killDjangoProcess()
+  })
+
+  // listen SIGINT (Ctrl+C)
+  process.on('SIGINT', () => {
+    if (djangoProcess) {
+      djangoProcess.kill()
+      console.log('[SIGINT] Django backend process killed.')
+    }
+    app.quit()
+  })
+
+  app.on('before-quit', () => {
+    if (djangoProcess) {
+      djangoProcess.kill()
+      console.log('[before-quit] Django backend process killed.')
+    }
+    killDjangoProcess()
+  })
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

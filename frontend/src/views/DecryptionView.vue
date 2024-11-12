@@ -1,6 +1,5 @@
 <template>
   <div class="decryption">
-    <h1>This is DecryptionView page</h1>
     <div class="upload-container">
       <el-upload
         action=""
@@ -27,8 +26,15 @@
           Only PNG images are supported
         </div>
       </el-upload>
+      <el-button
+        type="primary"
+        round
+        @click="uploadFiles"
+        style="font-size: 1.5rem; height: 100px; padding: 20px; line-height: 2rem"
+      >
+        Upload<br />to Server</el-button
+      >
     </div>
-    <el-button type="primary" round @click="uploadFiles">Upload to Server</el-button>
 
     <div v-if="downloadLinks.length > 0" class="DownloadLink">
       <h2>Download Links</h2>
@@ -134,7 +140,6 @@ const uploadFiles = async () => {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  max-width: 800px;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -142,6 +147,17 @@ const uploadFiles = async () => {
 .upload-component {
   margin: 0 10px;
   flex: 1;
+}
+
+.el-upload-dragger {
+  height: 100px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #409eff;
+  border-radius: 10px;
 }
 
 @media (min-width: 1024px) {

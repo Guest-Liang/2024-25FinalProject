@@ -49,4 +49,9 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    company_name='GuestLiang',
+    product_name='GuestLiang Django Restful API',
+    product_version='1.0.0rc1',
+    file_description='DjangoRestfulAPI, works on Port 8000',
+    copyright='© 2024 GuestLiang',
 )

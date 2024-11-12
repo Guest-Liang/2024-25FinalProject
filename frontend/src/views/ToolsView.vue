@@ -1,6 +1,5 @@
 <template>
   <div class="tools">
-    <h1>This is ToolsView page</h1>
     <div class="file-container">
       <el-upload
         action=""
@@ -18,8 +17,16 @@
         <div class="el-upload__text">Choose files that need to be hashed</div>
         <div class="el-upload__tip">Support all file types</div>
       </el-upload>
+
+      <el-button
+        type="primary"
+        round
+        @click="calculateHash"
+        style="font-size: 1.5rem; height: 100px; padding: 20px; line-height: 2rem"
+      >
+        Calculate<br />Hash</el-button
+      >
     </div>
-    <el-button type="primary" round @click="calculateHash">Calculate Hash</el-button>
 
     <div class="hash-table-container" v-if="hashResults.length > 0">
       <el-table :data="hashResults" border stripe>
@@ -88,7 +95,6 @@ const beforeUpload = (file: File) => {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  max-width: 800px;
   border-radius: 10px;
   overflow: hidden;
   padding: 0 0 10px 0;
@@ -97,10 +103,6 @@ const beforeUpload = (file: File) => {
 .upload-component {
   margin: 0 10px;
   flex: 1;
-}
-
-el-button {
-  margin-bottom: 10px;
 }
 
 .hash-table-container {
@@ -115,6 +117,17 @@ el-button {
   margin: 0;
   height: 55vh;
   width: 100%;
+}
+
+.el-upload-dragger {
+  height: 100px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #409eff;
+  border-radius: 10px;
 }
 
 @media (min-width: 1024px) {

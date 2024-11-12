@@ -3,18 +3,27 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
+from django.conf import settings
+
 logger = logging.getLogger(__name__)
 
-with open("./config/config.yaml", "r") as file:
-    CONFIG_YAML = yaml.safe_load(file)
+if __name__ == "__main__":
+    with open("./config/config.yaml", "r") as file:
+        CONFIG_YAML = yaml.safe_load(file)
+else: 
+    with open(os.path.join(settings.BASE_DIR, "../config/config.yaml"), "r") as file:
+        CONFIG_YAML = yaml.safe_load(file)
 
 
 def SendEmailWithAttachment(
-    sender_email,
     receiver_email,
-    subject,
-    body,
-    password,
+    sender_email=CONFIG_YAML["Email"]["Account"],
+    subject="Email From Django Restful API backend",
+    body= """
+    This email contains an attachment.
+    Do not reply to this email. --- From Python 3.12.7
+    """,
+    password=CONFIG_YAML["Email"]["Password"],
     file_paths=None,
     smtp_server="smtp.qq.com",
     smtp_port=587,
@@ -59,14 +68,15 @@ def SendEmailWithAttachment(
 
 if __name__ == "__main__":
     From = CONFIG_YAML["Email"]["Account"]
-    To = "GuestLiang@outlook.com"
-    Subject = "Test Email From Python With Attachment"
+    To = "1736331027@qq.com"
+    Subject = "Email From Django Restful API backend"
     Body = """
-    This email contains an attachment.
-    Do not reply to this email. --- From Python 3.12.7
+    Do not reply to this email.
+    If you received this email by mistake, it may be because our users have entered the wrong email address, please ignore it.
+    --- From Python 3.12.7
     """
     Password = CONFIG_YAML["Email"]["Password"]
-    FilePaths = ["./backend/pic/1.png", "./backend/pic/2.png"]
+    FilePaths = ["./backend/pic/3.png", "./backend/pic/4.png"]
 
     SendEmailWithAttachment(
         sender_email=From, 

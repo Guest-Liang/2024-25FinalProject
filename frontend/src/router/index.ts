@@ -9,21 +9,21 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
     },
-    {
-      path: '/encryption',
-      name: 'encryption',
-      component: () => import('../views/EncryptionView.vue'),
-    },
-    {
-      path: '/decryption',
-      name: 'decryption',
-      component: () => import('../views/DecryptionView.vue'),
-    },
-    {
-      path: '/tools',
-      name: 'tools',
-      component: () => import('../views/ToolsView.vue'),
-    },
+    // {
+    //   path: '/encryption',
+    //   name: 'encryption',
+    //   component: () => import('../views/EncryptionView.vue'),
+    // },
+    // {
+    //   path: '/decryption',
+    //   name: 'decryption',
+    //   component: () => import('../views/DecryptionView.vue'),
+    // },
+    // {
+    //   path: '/tools',
+    //   name: 'tools',
+    //   component: () => import('../views/ToolsView.vue'),
+    // },
   ],
 })
 

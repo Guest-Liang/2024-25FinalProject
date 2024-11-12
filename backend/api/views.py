@@ -8,7 +8,7 @@ from datetime import datetime
 import os, base64, random, urllib.parse, mimetypes, logging, pdb
 logger = logging.getLogger(__name__)
 # Personal imports
-import LSB, En_Decryption
+import LSB, En_Decryption, Email
 from .responses import CustomResponse
 
 class DecryptView(APIView):
@@ -64,6 +64,8 @@ class EncryptView(APIView):
     def post(self, request, *args, **kwargs):
         isUseCustomImg = request.data.get('isUseCustomImg')
         CustomImgPath = os.path.join(settings.TRANSIT_DIR, 'custom.png')
+        EmailAddress = request.data.get('EmailAddress')
+
         if isUseCustomImg is not None:
             with open(CustomImgPath, 'wb') as des:
                 for chunk in isUseCustomImg.chunks():
@@ -77,6 +79,7 @@ class EncryptView(APIView):
         Files = request.data.getlist('file')
         Timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         Results = []
+        OutputImagePaths = []
 
         for i,File in enumerate(Files):
             FilePath = os.path.join(settings.TRANSIT_DIR, File.name)
@@ -99,6 +102,7 @@ class EncryptView(APIView):
                     "status": "success",
                     "EncodedImagePath": OutputImagePath
                 })
+                OutputImagePaths.append(OutputImagePath)
 
             except Exception as e:
                 os.remove(FilePath)
@@ -109,6 +113,12 @@ class EncryptView(APIView):
 
         if os.path.exists(CustomImgPath):
             os.remove(CustomImgPath)
+        if EmailAddress:
+            try:
+                Email.SendEmailWithAttachment(EmailAddress, file_paths=OutputImagePaths)
+            except Exception as e:
+                logger.error(f"Failed to send email: {e}")
+                return CustomResponse(error="Failed to send email: " + str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return CustomResponse(results=Results, message="File encrypted and saved successfully", status=status.HTTP_200_OK)
 
     

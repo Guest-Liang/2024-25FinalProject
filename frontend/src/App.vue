@@ -12,40 +12,52 @@
       </el-aside>
 
       <el-container>
-        <el-header>Header</el-header>
+        <el-header>
+          <Header :cusheader="headerTitle"> </Header>
+        </el-header>
         <el-main>
           <component :is="currentComponent" />
         </el-main>
-        <el-footer>Footer</el-footer>
+        <el-footer>
+          <Footer></Footer>
+        </el-footer>
       </el-container>
     </el-container>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, markRaw } from 'vue'
+import { ref, shallowRef } from 'vue'
 
 import HomeView from './views/HomeView.vue'
 import EncryptionView from './views/EncryptionView.vue'
 import DecryptionView from './views/DecryptionView.vue'
 import ToolsView from './views/ToolsView.vue'
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
 
-const currentComponent = ref(markRaw(HomeView))
+const currentComponent = shallowRef(HomeView)
+
+const headerTitle = ref('Home')
 
 const showHome = () => {
   currentComponent.value = HomeView
+  headerTitle.value = 'Home'
 }
 
 const showEncryption = () => {
   currentComponent.value = EncryptionView
+  headerTitle.value = 'Encryption'
 }
 
 const showDecryption = () => {
   currentComponent.value = DecryptionView
+  headerTitle.value = 'Decryption'
 }
 
 const showTools = () => {
   currentComponent.value = ToolsView
+  headerTitle.value = 'Tools'
 }
 </script>
 
@@ -59,13 +71,6 @@ const showTools = () => {
 .el-container {
   height: 100%;
   display: flex;
-}
-
-.el-header {
-  text-align: center;
-  align-items: center;
-  width: 100%;
-  line-height: 100px;
 }
 
 .el-aside {
@@ -95,9 +100,16 @@ const showTools = () => {
 }
 
 .el-main {
-  width: 95%;
+  width: 97%;
   overflow: visible;
   justify-content: center;
   align-items: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 15px;
+  margin-top: 2rem;
+}
+
+.el-footer {
+  width: 100%;
 }
 </style>

@@ -1,6 +1,5 @@
 <template>
   <div class="encryption">
-    <h1>This is EncryptionView page</h1>
     <div class="upload-container">
       <el-upload
         action=""
@@ -13,6 +12,7 @@
         :show-file-list="true"
         :auto-upload="false"
         accept="*"
+        :on-remove="handleEncryptFileRemove"
       >
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">
@@ -39,6 +39,7 @@
         :auto-upload="false"
         :limit="1"
         accept="image/png"
+        :on-remove="handleCustomFileRemove"
       >
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">{{ customImageName || 'Select a custom image' }}</div>
@@ -50,7 +51,28 @@
       </el-upload>
     </div>
 
-    <el-button type="primary" round @click="uploadFiles">Upload to Server</el-button>
+    <div class="button-group">
+      <el-button type="primary" round @click="uploadFiles">Upload to Server</el-button>
+      <el-button type="primary" round @click="cleanUploadFiles">Clean up all files</el-button>
+      <el-divider direction="vertical" />
+      <span>Get results throught email? </span>
+      <el-switch
+        v-model="isSendingEmail"
+        class="ml-2"
+        inline-prompt
+        size="large"
+        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+        active-text="Y"
+        inactive-text="N"
+      />
+      <el-input
+        v-if="isSendingEmail"
+        v-model="inputEmail"
+        style="width: 240px; margin-left: 10px"
+        clearable
+        placeholder="Please input Email Address"
+      />
+    </div>
 
     <div v-if="downloadLinks.length > 0" class="DownloadLink">
       <h2>Download Links</h2>
@@ -69,12 +91,38 @@ import { ElLoading, ElMessage } from 'element-plus'
 import type { EncryptResult, DownloadLink } from '@/types/interface'
 import { BACKEND_API } from '@/types/config'
 
+const isSendingEmail = ref(false)
+const inputEmail = ref('')
+
 const downloadLinks = ref<DownloadLink[]>([])
 
 const encryptFileList = ref<File[]>([])
 const customImageList = ref<File[]>([])
 const encryptFileName = ref<string | null>(null)
 const customImageName = ref<string | null>(null)
+
+const isValidEmail = (email: string) => {
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  return emailPattern.test(email)
+}
+
+const handleEncryptFileRemove = (file: File, fileList: File[]) => {
+  encryptFileList.value = fileList
+  console.log(`Removed file: ${file.name}`)
+}
+
+const handleCustomFileRemove = (file: File, fileList: File[]) => {
+  customImageList.value = fileList
+  console.log(`Removed custom image: ${file.name}`)
+}
+
+const cleanUploadFiles = () => {
+  encryptFileList.value = []
+  customImageList.value = []
+  encryptFileName.value = null
+  customImageName.value = null
+  downloadLinks.value = []
+}
 
 const handleCustomImageChange = (fileList: { raw: File }) => {
   customImageList.value.push(fileList.raw)
@@ -106,14 +154,20 @@ const uploadFiles = async () => {
     background: 'rgba(0, 0, 0, 0.6)',
   })
 
-  let RawEncryptFileList = toRaw(encryptFileList.value)
-  let RawCustomImageList = toRaw(customImageList.value)
-
   if (encryptFileList.value.length === 0) {
     ElMessage.warning('Please choose at least one file to encrypt!')
     loading.close()
     return
   }
+
+  if (isSendingEmail.value && !isValidEmail(inputEmail.value)) {
+    ElMessage.warning('Please input a valid email address!')
+    loading.close()
+    return
+  }
+
+  let RawEncryptFileList = toRaw(encryptFileList.value)
+  let RawCustomImageList = toRaw(customImageList.value)
 
   const formData = new FormData()
   RawEncryptFileList.forEach((file) => {
@@ -122,6 +176,10 @@ const uploadFiles = async () => {
 
   if (customImageList.value.length > 0) {
     formData.append('isUseCustomImg', RawCustomImageList[0])
+  }
+
+  if (isSendingEmail.value) {
+    formData.append('EmailAddress', inputEmail.value)
   }
 
   try {
@@ -167,7 +225,6 @@ const uploadFiles = async () => {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  max-width: 800px;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -176,6 +233,32 @@ const uploadFiles = async () => {
   transition: height 0.2s;
   margin: 0 10px;
   flex: 1;
+  width: 30%;
+}
+
+.el-upload-dragger {
+  height: 100px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #409eff;
+  border-radius: 10px;
+}
+
+.el-upload-dragger .el-upload__text {
+  font-size: 1.4rem;
+}
+
+.el-upload__tip {
+  font-size: 1rem;
+}
+
+.encryption .el-button {
+  margin-top: 0.25rem;
+  font-size: 1rem;
+  padding: 20px 20px;
 }
 
 @media (min-width: 1024px) {
