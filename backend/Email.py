@@ -17,11 +17,12 @@ else:
 
 def SendEmailWithAttachment(
     receiver_email,
-    sender_email=CONFIG_YAML["Email"]["Account"],
-    subject="Email From Django Restful API backend",
-    body= """
-    This email contains an attachment.
-    Do not reply to this email. --- From Python 3.12.7
+    sender_email = CONFIG_YAML["Email"]["Account"],
+    subject = "Email From Django Restful API backend",
+    body = """
+    Do not reply to this email.
+    If you received this email by mistake, it may be because our users have entered the wrong email address, please ignore it.
+    --- From Python 3.12.7
     """,
     password=CONFIG_YAML["Email"]["Password"],
     file_paths=None,

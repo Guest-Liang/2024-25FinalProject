@@ -95,7 +95,7 @@ class EncryptView(APIView):
 
                 # Encode the encrypted info into an image
                 ImagePath = os.path.join(settings.PIC_DIR, random.choice(os.listdir(settings.PIC_DIR))) if isUseCustomImg == None else CustomImgPath
-                OutputImagePath = os.path.join(settings.TRANSIT_DIR, f"EncodedImage_{Timestamp}_{i}.png")
+                OutputImagePath = os.path.join(settings.TRANSIT_DIR, f"{File.name}_ImageKey_{Timestamp}.png")
                 LSB.LSB_Encode(ImagePath, OutputImagePath, EncryptedInfo)
                 
                 Results.append({
@@ -119,7 +119,10 @@ class EncryptView(APIView):
             except Exception as e:
                 logger.error(f"Failed to send email: {e}")
                 return CustomResponse(error="Failed to send email: " + str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return CustomResponse(results=Results, message="File encrypted and saved successfully", status=status.HTTP_200_OK)
+        return CustomResponse(results=Results,
+                              message="File encrypted and saved, Email successfully sent." if EmailAddress is not None else "File encrypted and saved.", 
+                              status=status.HTTP_200_OK
+                              )
 
     
 class DownloadView(APIView):

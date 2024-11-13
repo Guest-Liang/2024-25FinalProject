@@ -18,20 +18,46 @@
         <div class="el-upload__tip">Support all file types</div>
       </el-upload>
 
-      <el-button
-        type="primary"
-        round
-        @click="calculateHash"
-        style="font-size: 1.5rem; height: 100px; padding: 20px; line-height: 2rem"
+      <div
+        class="button-container"
+        style="display: flex; flex-direction: column; height: 100px; width: 150px"
       >
-        Calculate<br />Hash</el-button
-      >
+        <el-button
+          type="primary"
+          round
+          @click="calculateHash"
+          style="
+            font-size: 1rem;
+            height: 48%;
+            line-height: 1.2rem;
+            white-space: normal;
+            word-wrap: break-word;
+          "
+        >
+          Calculate Hash
+        </el-button>
+        <el-button
+          type="danger"
+          round
+          @click="cleanUploadFiles"
+          style="
+            font-size: 1rem;
+            height: 48%;
+            margin-top: 4%;
+            line-height: 1.2rem;
+            white-space: normal;
+            word-wrap: break-word;
+          "
+        >
+          Clean up all files
+        </el-button>
+      </div>
     </div>
 
     <div class="hash-table-container" v-if="hashResults.length > 0">
       <el-table :data="hashResults" border stripe>
-        <el-table-column prop="fileName" label="File Name" min-width="20%" />
-        <el-table-column prop="hash" label="SHA-256 Hash" min-width="80%" />
+        <el-table-column prop="fileName" label="File Name" min-width="30%" />
+        <el-table-column prop="hash" label="SHA-256 Hash" min-width="70%" />
       </el-table>
     </div>
   </div>
@@ -40,7 +66,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import CryptoJS from 'crypto-js'
-import { ElMessage } from 'element-plus'
+import { ElLoading, ElMessage } from 'element-plus'
 
 const fileList = ref<File[]>([])
 const hashResults = ref<{ fileName: string; hash: string; raw: File }[]>([])
@@ -49,12 +75,26 @@ const handleFileChange = (file: { raw: File }) => {
   hashResults.value.push({ fileName: file.raw.name, hash: '', raw: file.raw })
 }
 
+const cleanUploadFiles = () => {
+  hashResults.value = []
+  fileList.value = []
+}
+
 const calculateHash = async () => {
+  const loading = ElLoading.service({
+    target: '.tools',
+    lock: true,
+    text: 'Calculating hash...',
+    background: 'rgba(0, 0, 0, 0.6)',
+  })
+
   for (let i = 0; i < hashResults.value.length; i++) {
     const file = hashResults.value[i]
     const hash = await getFileHash(file.raw)
     hashResults.value[i].hash = hash
   }
+
+  loading.close()
 }
 
 const getFileHash = (file: File): Promise<string> => {
@@ -85,6 +125,9 @@ const beforeUpload = (file: File) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  padding-bottom: 10px;
 }
 
 .el-upload-dragger {
@@ -106,7 +149,7 @@ const beforeUpload = (file: File) => {
 }
 
 .hash-table-container {
-  max-height: 60vh;
+  max-height: 50%;
   width: 100%;
   min-width: 200px;
   padding-top: 10px;
@@ -115,7 +158,7 @@ const beforeUpload = (file: File) => {
 .el-table {
   margin-top: 10px;
   margin: 0;
-  height: 55vh;
+  height: 50vh;
   width: 100%;
 }
 
@@ -128,6 +171,10 @@ const beforeUpload = (file: File) => {
   align-items: center;
   border: 2px dashed #409eff;
   border-radius: 10px;
+}
+
+.el-button + .el-button {
+  margin-left: 0;
 }
 
 @media (min-width: 1024px) {

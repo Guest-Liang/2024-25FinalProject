@@ -53,7 +53,9 @@
 
     <div class="button-group">
       <el-button type="primary" round @click="uploadFiles">Upload to Server</el-button>
-      <el-button type="primary" round @click="cleanUploadFiles">Clean up all files</el-button>
+      <el-button type="danger" round @click="cleanUploadFiles" style="margin-left: 10px"
+        >Clean up all files</el-button
+      >
       <el-divider direction="vertical" />
       <span>Get results throught email? </span>
       <el-switch
@@ -87,7 +89,7 @@
 
 <script setup lang="ts">
 import { ref, toRaw } from 'vue'
-import { ElLoading, ElMessage } from 'element-plus'
+import { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 import type { EncryptResult, DownloadLink } from '@/types/interface'
 import { BACKEND_API } from '@/types/config'
 
@@ -138,10 +140,20 @@ const beforeUpload = (file: File) => {
   const isPNG = file.type === 'image/png'
   const isValidSize = file.size / 1024 / 1024 < 10 && file.size / 1024 > 200 // Limit to 200KB-10MB
   if (!isValidSize) {
-    ElMessage.error('Custom image size cannot exceed 10MB')
+    ElMessage({
+      showClose: true,
+      message: 'Custom image size cannot exceed 10MB',
+      type: 'error',
+      duration: 5000,
+    })
   }
   if (!isPNG) {
-    ElMessage.error('Only PNG images are supported')
+    ElMessage({
+      showClose: true,
+      message: 'Only PNG images are supported',
+      type: 'error',
+      duration: 5000,
+    })
   }
   return isValidSize && isPNG
 }
@@ -155,13 +167,23 @@ const uploadFiles = async () => {
   })
 
   if (encryptFileList.value.length === 0) {
-    ElMessage.warning('Please choose at least one file to encrypt!')
+    ElMessage({
+      showClose: true,
+      message: 'Please choose at least one file to encrypt!',
+      type: 'warning',
+      duration: 5000,
+    })
     loading.close()
     return
   }
 
   if (isSendingEmail.value && !isValidEmail(inputEmail.value)) {
-    ElMessage.warning('Please input a valid email address!')
+    ElMessage({
+      showClose: true,
+      message: 'Please input a valid email address!',
+      type: 'error',
+      duration: 5000,
+    })
     loading.close()
     return
   }
@@ -189,8 +211,9 @@ const uploadFiles = async () => {
       body: formData,
     })
 
+    const data = await response.json()
+
     if (response.ok) {
-      const data = await response.json()
       downloadLinks.value = data.results.map((item: EncryptResult, index: number) => {
         const fileName = item.EncodedImagePath.split('\\').pop()
         const originalFile = encryptFileList.value[index]
@@ -200,14 +223,23 @@ const uploadFiles = async () => {
           originalName: originalFile.name,
         }
       })
-      ElMessage.success('Files uploaded successfully!')
+      ElMessageBox.alert(data.message, 'Success', {
+        confirmButtonText: 'OK',
+        type: 'success',
+      })
     } else {
-      ElMessage.error('File upload failed!')
-      console.error('Upload failed:', response)
+      ElMessageBox.alert(data.error, 'Error', {
+        confirmButtonText: 'OK',
+        type: 'error',
+      })
+      console.error('Upload failed:', data.error)
     }
   } catch (error) {
     console.error('Upload error:', error)
-    ElMessage.error('Error uploading file!')
+    ElMessageBox.alert('Error uploading file!', 'Error', {
+      confirmButtonText: 'OK',
+      type: 'error',
+    })
   } finally {
     loading.close()
   }

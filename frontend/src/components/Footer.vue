@@ -10,10 +10,8 @@
 <style scoped>
 .footer-content {
   text-align: center;
-  padding: 0px;
+  padding: 0;
   font-size: 1rem;
   color: #666;
-  border-top: 1px solid #e0e0e0;
-  border-radius: 10px;
 }
 </style>

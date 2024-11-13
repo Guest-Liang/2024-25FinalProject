@@ -2,7 +2,7 @@
   <div class="common-layout">
     <el-container>
       <el-aside>
-        <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+        <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="75" height="75" />
         <div class="wrapper">
           <el-button @click="showHome" type="primary" plain>Home</el-button>
           <el-button @click="showEncryption" type="primary" plain>Encryption</el-button>
@@ -11,17 +11,18 @@
         </div>
       </el-aside>
 
-      <el-container>
+      <el-container class="inner-el-container">
         <el-header>
           <Header :cusheader="headerTitle"> </Header>
         </el-header>
         <el-main>
           <component :is="currentComponent" />
         </el-main>
-        <el-footer>
-          <Footer></Footer>
-        </el-footer>
       </el-container>
+
+      <el-footer>
+        <Footer></Footer>
+      </el-footer>
     </el-container>
   </div>
 </template>
@@ -75,9 +76,11 @@ const showTools = () => {
 
 .el-aside {
   text-align: center;
-  height: 100%;
-  width: 15%;
-  min-width: 150px;
+  height: calc(100% - 90px);
+  width: 12%;
+  min-width: 130px;
+  position: fixed;
+  z-index: 5;
 }
 
 .wrapper {
@@ -95,21 +98,26 @@ const showTools = () => {
   margin-left: 0;
 }
 
-.el-container.el-container {
-  align-items: center;
+.inner-el-container {
+  margin-left: max(calc(12% + 20px), calc(130px + 10px));
+  flex-direction: column;
+  height: calc(100vh - 90px);
 }
 
 .el-main {
-  width: 97%;
-  overflow: visible;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   justify-content: center;
   align-items: center;
   border: 1px solid #e0e0e0;
-  border-radius: 15px;
+  border-radius: 10px;
   margin-top: 2rem;
 }
 
 .el-footer {
-  width: 100%;
+  background-color: white;
+  z-index: 10;
+  justify-content: center;
 }
 </style>

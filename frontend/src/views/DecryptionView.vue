@@ -26,14 +26,40 @@
           Only PNG images are supported
         </div>
       </el-upload>
-      <el-button
-        type="primary"
-        round
-        @click="uploadFiles"
-        style="font-size: 1.5rem; height: 100px; padding: 20px; line-height: 2rem"
+      <div
+        class="button-container"
+        style="display: flex; flex-direction: column; height: 100px; width: 150px"
       >
-        Upload<br />to Server</el-button
-      >
+        <el-button
+          type="primary"
+          round
+          @click="uploadFiles"
+          style="
+            font-size: 1rem;
+            height: 48%;
+            line-height: 1.2rem;
+            white-space: normal;
+            word-wrap: break-word;
+          "
+        >
+          Upload to Server
+        </el-button>
+        <el-button
+          type="danger"
+          round
+          @click="cleanUploadFiles"
+          style="
+            font-size: 1rem;
+            height: 48%;
+            margin-top: 4%;
+            line-height: 1.2rem;
+            white-space: normal;
+            word-wrap: break-word;
+          "
+        >
+          Clean up all files
+        </el-button>
+      </div>
     </div>
 
     <div v-if="downloadLinks.length > 0" class="DownloadLink">
@@ -49,7 +75,7 @@
 
 <script setup lang="ts">
 import { ref, toRaw } from 'vue'
-import { ElLoading, ElMessage } from 'element-plus'
+import { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 import type { DecryptResult, DownloadLink } from '@/types/interface'
 import { BACKEND_API } from '@/types/config'
 
@@ -60,21 +86,34 @@ const handleImageChange = (fileList: { raw: File }) => {
   customImageList.value.push(fileList.raw)
 }
 
-const handleImageRemove = (file: File) => {
-  const index = customImageList.value.findIndex((item) => item.name === file.name)
-  if (index !== -1) {
-    customImageList.value.splice(index, 1)
-  }
+const handleImageRemove = (file: File, fileList: File[]) => {
+  customImageList.value = fileList
+  console.log(`Removed custom image: ${file.name}`)
+}
+
+const cleanUploadFiles = () => {
+  customImageList.value = []
+  downloadLinks.value = []
 }
 
 const beforeUpload = (file: File) => {
   const isPNG = file.type === 'image/png'
   const isValidSize = file.size / 1024 / 1024 < 10 && file.size / 1024 > 200 // Limit to 200KB-10MB
   if (!isValidSize) {
-    ElMessage.error('Custom image size cannot exceed 10MB')
+    ElMessage({
+      showClose: true,
+      message: 'Custom image size cannot exceed 10MB',
+      type: 'error',
+      duration: 5000,
+    })
   }
   if (!isPNG) {
-    ElMessage.error('Only PNG images are supported')
+    ElMessage({
+      showClose: true,
+      message: 'Only PNG images are supported',
+      type: 'error',
+      duration: 5000,
+    })
   }
   return isValidSize && isPNG
 }
@@ -89,7 +128,12 @@ const uploadFiles = async () => {
 
   let RawCustomImageList = toRaw(customImageList.value)
   if (customImageList.value.length === 0) {
-    ElMessage.warning('Please choose at least one file to decrypt!')
+    ElMessage({
+      showClose: true,
+      message: 'Please choose at least one file to encrypt!',
+      type: 'warning',
+      duration: 5000,
+    })
     loading.close()
     return
   }
@@ -115,14 +159,23 @@ const uploadFiles = async () => {
           url: `http://${BACKEND_API}/api/download/${fileName}`,
         }
       })
-      ElMessage.success('Files uploaded successfully!')
+      ElMessageBox.alert(data.message, 'Success', {
+        confirmButtonText: 'OK',
+        type: 'success',
+      })
     } else {
-      ElMessage.error('File upload failed!')
+      ElMessageBox.alert('File upload failed!', 'Error', {
+        confirmButtonText: 'OK',
+        type: 'error',
+      })
       console.error('Upload failed:', response)
     }
   } catch (error) {
     console.error('Upload error:', error)
-    ElMessage.error('Error uploading file!')
+    ElMessageBox.alert('Error uploading file!', 'Error', {
+      confirmButtonText: 'OK',
+      type: 'error',
+    })
   } finally {
     loading.close()
   }
@@ -158,6 +211,10 @@ const uploadFiles = async () => {
   align-items: center;
   border: 2px dashed #409eff;
   border-radius: 10px;
+}
+
+.el-button + .el-button {
+  margin-left: 0;
 }
 
 @media (min-width: 1024px) {

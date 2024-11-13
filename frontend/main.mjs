@@ -21,11 +21,14 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname).slice(1)
 let isDev = false
 let win
 let djangoProcess
+let djangoExePath
 
 function createWindow() {
   win = new BrowserWindow({
     width: 1280,
     height: 720,
+    minWidth: 500,
+    minHeight: 300,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -35,9 +38,13 @@ function createWindow() {
   })
 
   // sometimes use dev mode
-  if (isDev) {
-    const djangoExePath = path.join(__dirname, '../backend/dist/DjangoRestfulAPI.exe')
+  if (!isDev) {
+    djangoExePath = path.join(__dirname, './DjangoRestfulAPI.exe')
+  } else {
+    djangoExePath = path.join(__dirname, '../backend/dist/DjangoRestfulAPI.exe')
+  }
 
+  if (!isDev) {
     djangoProcess = execFile(djangoExePath, ['runserver', '--noreload'], (error, stdout, stderr) => {
       if (error) {
         console.error(`[django internal server error] ${error}`)
@@ -65,10 +72,12 @@ function createWindow() {
     djangoProcess.on('exit', (code) => {
       console.log(`Django backend process exited with code ${code}`)
     })
+
+    win.loadFile('./dist/index.html') // prod
+  } else {
+    win.loadURL('http://localhost:5173') // dev, hot reload
   }
 
-  win.loadURL('http://localhost:5173') // dev, hot reload
-  // win.loadFile('./dist/index.html') // prod
   win.on('closed', () => {
     win = null
   })
