@@ -39,7 +39,7 @@ class DecryptView(APIView):
                 DecryptedData, FileName = En_Decryption.DecryptFile(EncryptedInfo)
             
                 # Save the decrypted file to TRANSIT_DIR
-                OutputPath = os.path.join(settings.TRANSIT_DIR, f"{Timestamp}_{base64.b64decode(FileName).decode('utf-8')}")
+                OutputPath = os.path.join(settings.TRANSIT_DIR, f"{Timestamp}_{base64.urlsafe_b64decode(FileName).decode('utf-8')}")
                 with open(OutputPath, 'wb') as OutputFile:
                     OutputFile.write(DecryptedData)
             

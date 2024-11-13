@@ -66,7 +66,7 @@ def LSB_Decode(image_path):
 if __name__ == "__main__":
 
     SecretMessage = "Hello, this is a test secret message!"
-    Base64_Message = base64.b64encode(SecretMessage.encode()).decode()
+    Base64_Message = base64.urlsafe_b64decode(SecretMessage.encode()).decode()
     print("Base64 encoded message:", Base64_Message)
     LSB_Encode(r"backend\pic\4.png", "output_image.png", Base64_Message)
 

@@ -1,6 +1,6 @@
 {
   "name": "guestliang-electron-app",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "main": "main.mjs",
@@ -51,9 +51,21 @@
   "build": {
     "appId": "icu.guestliang.electron.app",
     "productName": "GuestLiangElectronApp",
+    "asar": false,
     "files": [
       "dist/**/*",
       "main.mjs"
+    ],
+    "extraResources": [
+      {
+      "from": "../backend/dist/",
+      "to": "APIDataDir"
+      },
+      {
+        "from": "../config/",
+        "to": "config",
+        "filter": ["*.yaml"]
+      }
     ],
     "directories": {
       "output": "build"

@@ -2,6 +2,8 @@ import { app, BrowserWindow, Menu } from 'electron'
 import path from 'path'
 import { execFile, exec } from 'child_process'
 
+process.env.NODE_OPTIONS = '--encoding=UTF-8';
+
 const killDjangoProcess = () => {
   exec('taskkill -F -IM DjangoRestfulAPI.exe', (error, stdout, stderr) => {
     if (error) {
@@ -18,7 +20,7 @@ const killDjangoProcess = () => {
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname).slice(1)
 
-let isDev = false
+let isDev = true
 let win
 let djangoProcess
 let djangoExePath
@@ -39,7 +41,7 @@ function createWindow() {
 
   // sometimes use dev mode
   if (!isDev) {
-    djangoExePath = path.join(__dirname, './DjangoRestfulAPI.exe')
+    djangoExePath = path.join(__dirname, '../APIDataDir/DjangoRestfulAPI.exe')
   } else {
     djangoExePath = path.join(__dirname, '../backend/dist/DjangoRestfulAPI.exe')
   }

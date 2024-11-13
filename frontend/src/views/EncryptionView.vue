@@ -108,15 +108,22 @@ const isValidEmail = (email: string) => {
   return emailPattern.test(email)
 }
 
-const handleEncryptFileRemove = (file: File, fileList: File[]) => {
-  encryptFileList.value = fileList
-  console.log(`Removed file: ${file.name}`)
+const handleEncryptFileRemove = (file: File) => {
+  const index = encryptFileList.value.indexOf(file);
+  if (index > -1) {
+    encryptFileList.value.splice(index, 1);
+  }
+  console.log(`Removed file: ${file.name}`);
 }
 
-const handleCustomFileRemove = (file: File, fileList: File[]) => {
-  customImageList.value = fileList
-  console.log(`Removed custom image: ${file.name}`)
+const handleCustomFileRemove = (file: File) => {
+  const index = customImageList.value.indexOf(file);
+  if (index > -1) {
+    customImageList.value.splice(index, 1);
+  }
+  console.log(`Removed custom image: ${file.name}`);
 }
+
 
 const cleanUploadFiles = () => {
   encryptFileList.value = []

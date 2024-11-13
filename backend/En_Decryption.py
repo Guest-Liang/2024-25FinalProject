@@ -97,7 +97,15 @@ def DecryptFile(EncryptedFileString):
     return DecryptedData, FileName
 
 if __name__ == "__main__":
-    TestFilePath = os.path.join(settings.TRANSIT_DIR, "test.txt")
+    # TestFilePath = os.path.join(settings.TRANSIT_DIR, "test.txt")
+    class Settings:
+        def __init__(self):
+            self.STORAGE_DIR = r'D:\files\VSCode\2024-25FinalProject\backend\storage'
+            self.TRANSIT_DIR = r'D:\files\VSCode\2024-25FinalProject\backend\transit'
+    
+    settings = Settings()
+
+    TestFilePath = r'D:\files\VSCode\2024-25FinalProject\backend\transit\公司oui.txt_ImageKey_20241114_035526.png'
     
     Result = EncryptFile(TestFilePath)
 
