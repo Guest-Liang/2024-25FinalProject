@@ -77,7 +77,7 @@ print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Running PyInst
 # Define platform-specific configurations in a dictionary
 platforms = {
     'win': {'distpath': 'dist/windows', 'platform': 'win32'},
-    'mac': {'distpath': 'dist/macos', 'platform': 'darwin', 'archs': ['x86_64', 'arm64']},
+    'mac': {'distpath': 'dist/macos', 'platform': 'darwin'},
     'linux': {'distpath': 'dist/linux', 'platform': 'linux'}
 }
 
@@ -86,59 +86,32 @@ if PlatformArg in platforms:
     print(f"[INFO] Building for {PlatformArg.capitalize()}.")
     config = platforms[PlatformArg]
 
-    if PlatformArg == 'mac':
-        # For macOS, we need to handle both x86_64 and arm64 architectures
-        for arch in config['archs']:
-            args = [
-                'manage.py',
-                f'--name={FileName}',
-                '--onefile',  # Single executable file
-                '--console',  # Console output
-                '--hidden-import=django.contrib.admin',
-                '--hidden-import=django.contrib.auth',
-                '--hidden-import=django.contrib.contenttypes',
-                '--hidden-import=django.contrib.sessions',
-                '--hidden-import=django.contrib.messages',
-                '--hidden-import=django.contrib.staticfiles',
-                '--hidden-import=rest_framework',
-                '--hidden-import=api',
-                '--hidden-import=corsheaders',
-                '--add-data=storage:storage',
-                '--add-data=transit:transit',
-                '--add-data=pic:pic',
-                f'--version-file={VersionFileName}',
-                '--distpath', config['distpath'],
-                '--workpath', 'build',
-                f'--arch={arch}'  # Architecture
-            ]
-            print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Building for macOS with architecture {arch}')
-            PyInstaller.__main__.run(args)
-    else:
-        # For other platforms (win, linux), build once
-        args = [
-            'manage.py',
-            f'--name={FileName}',
-            '--onefile',  # Single executable file
-            '--console',  # Console output
-            '--hidden-import=django.contrib.admin',
-            '--hidden-import=django.contrib.auth',
-            '--hidden-import=django.contrib.contenttypes',
-            '--hidden-import=django.contrib.sessions',
-            '--hidden-import=django.contrib.messages',
-            '--hidden-import=django.contrib.staticfiles',
-            '--hidden-import=rest_framework',
-            '--hidden-import=api',
-            '--hidden-import=corsheaders',
-            '--add-data=storage:storage',
-            '--add-data=transit:transit',
-            '--add-data=pic:pic',
-            f'--version-file={VersionFileName}',
-            '--distpath', config['distpath'],
-            '--workpath', 'build',
-            '--noconfirm',
-        ]
-        print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Building for platform: {PlatformArg}')
-        PyInstaller.__main__.run(args)
+    # Build arguments for PyInstaller
+    args = [
+        'manage.py',
+        f'--name={FileName}',
+        '--onefile',            # Single executable file
+        '--console',            # Console output
+        '--noconfirm',          # Automatic confirmation, ignore all prompts
+        '--hidden-import=django.contrib.admin',
+        '--hidden-import=django.contrib.auth',
+        '--hidden-import=django.contrib.contenttypes',
+        '--hidden-import=django.contrib.sessions',
+        '--hidden-import=django.contrib.messages',
+        '--hidden-import=django.contrib.staticfiles',
+        '--hidden-import=rest_framework',
+        '--hidden-import=api',
+        '--hidden-import=corsheaders',
+        '--add-data=storage:storage',
+        '--add-data=transit:transit',
+        '--add-data=pic:pic',
+        f'--version-file={VersionFileName}',
+        '--distpath', config['distpath'],
+        '--workpath', 'build',
+    ]
+
+    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Building for platform: {PlatformArg}')
+    PyInstaller.__main__.run(args)
 else:
     print(f"[INFO] Invalid platform specified: {PlatformArg}. Exiting...")
     exit(1)

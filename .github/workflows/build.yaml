@@ -11,15 +11,20 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}  # 使用 matrix 中的 os 配置来指定 macos-11 或 macos-12
+    runs-on: ${{ matrix.os }}  # 使用 matrix 中的 os 配置来指定不同的运行环境
 
     strategy:
       matrix:
-        platform: [win, linux]       # Windows 和 Linux 平台
-        os: [macos-11, macos-12]     # macOS 的两种版本
         include:
-          - platform: mac            # 为 macOS 设置单独的构建步骤
+          - platform: win
+            os: windows-latest
+
+          - platform: linux
+            os: ubuntu-latest
+
+          - platform: mac
             os: macos-11
+
           - platform: mac
             os: macos-12
 
