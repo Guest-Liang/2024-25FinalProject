@@ -1,13 +1,14 @@
 name: Test Electron Build
 
 on:
+  workflow_dispatch:
+  
   push:
     branches:
       - test-ci
   pull_request:
     branches:
       - test-ci
-  workflow_dispatch:
 
 jobs:
   build:
@@ -84,4 +85,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: electron-build-${{ matrix.platform }}-${{ matrix.os }}
-          path: build/${{ matrix.platform }}/*
+          path: build/
