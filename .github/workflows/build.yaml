@@ -64,6 +64,7 @@ jobs:
         working-directory: ./backend
 
       - name: Build Electron app for ${{ matrix.platform }}
+        shell: bash      
         run: |
           echo "Building Electron app for ${{ matrix.platform }} on ${{ matrix.os }}"
           if [ "${{ matrix.platform }}" == "win" ]; then
