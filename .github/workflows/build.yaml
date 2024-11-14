@@ -67,12 +67,12 @@ jobs:
         run: |
           echo "Building Electron app for ${{ matrix.platform }} on ${{ matrix.os }}"
           if [ "${{ matrix.platform }}" == "win" ]; then
-            pnpm run electron-builder --win
+            pnpm electron-builder --win
           elif [ "${{ matrix.platform }}" == "mac" ]; then
             if [ "${{ matrix.os }}" == "macos-11" ]; then
-              pnpm run electron-builder --mac --x64  # 针对 x86_64
+              pnpm electron-builder --mac --x64  # 针对 x86_64
             elif [ "${{ matrix.os }}" == "macos-12" ]; then
-              pnpm run electron-builder --mac --arm64  # 针对 arm64
+              pnpm electron-builder --mac --arm64  # 针对 arm64
             fi
           elif [ "${{ matrix.platform }}" == "linux" ]; then
             pnpm run electron-builder --linux
