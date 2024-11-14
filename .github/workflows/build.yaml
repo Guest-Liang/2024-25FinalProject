@@ -19,14 +19,14 @@ jobs:
           - platform: win
             os: windows-latest
 
-          - platform: linux
-            os: ubuntu-latest
+          # - platform: linux
+          #   os: ubuntu-latest
 
-          - platform: mac
-            os: macos-11
+          # - platform: mac
+          #   os: macos-11
 
-          - platform: mac
-            os: macos-12
+          # - platform: mac
+          #   os: macos-12
 
     steps:
       - name: Checkout code
@@ -75,7 +75,7 @@ jobs:
               pnpm electron-builder --mac --arm64  # 针对 arm64
             fi
           elif [ "${{ matrix.platform }}" == "linux" ]; then
-            pnpm run electron-builder --linux
+            pnpm electron-builder --linux
           fi
         working-directory: ./frontend
 
