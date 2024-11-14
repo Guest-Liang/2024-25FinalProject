@@ -43,18 +43,26 @@ VSVersionInfo(
         subtype=0x0,
         date=(0, 0)
     ),
-    kids=[StringFileInfo([
-        StringTable('040904B0', [
-            StringStruct('CompanyName', 'GuestLiang'),
-            StringStruct('FileDescription', '{AppName} {Version}'),
-            StringStruct('FileVersion', '{Version}'),
-            StringStruct('InternalName', '{AppName}'),
-            StringStruct('LegalCopyright', '2024 © GuestLiang'),
-            StringStruct('OriginalFilename', '{AppName}.exe'),
-            StringStruct('ProductName', 'GuestLiang Django Restful API'),
-            StringStruct('ProductVersion', '{Version}')
-        ])])],
-    VarFileInfo([VarStruct('Translation', [2052, 1200])])]
+    kids=[
+        StringFileInfo(
+            [
+                StringTable(
+                    '040904B0', 
+                    [
+                        StringStruct('CompanyName', 'GuestLiang'),
+                        StringStruct('FileDescription', '{AppName} {Version}'),
+                        StringStruct('FileVersion', '{Version}'),
+                        StringStruct('InternalName', '{AppName}'),
+                        StringStruct('LegalCopyright', '2024 © GuestLiang'),
+                        StringStruct('OriginalFilename', '{AppName}.exe'),
+                        StringStruct('ProductName', 'GuestLiang Django Restful API'),
+                        StringStruct('ProductVersion', '{Version}')
+                    ]
+                )
+            ]
+        ),
+        VarFileInfo([VarStruct('Translation', [2052, 1200])])
+    ]
 )
 '''
 
