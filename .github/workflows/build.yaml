@@ -1,0 +1,71 @@
+name: Test Electron Build
+
+on:
+  push:
+    branches:
+      - test-ci
+  pull_request:
+    branches:
+      - test-ci
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        platform: [win, mac, linux]  # 在多个平台上构建
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+
+      - name: Install pnpm
+        run: |
+          npm install -g pnpm
+
+      - name: Install dependencies using pnpm # vue 构建
+        run: |
+          pnpm install
+          pnpm run build-only
+        working-directory: ./frontend  # 指定工作目录为 frontend 文件夹
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: ./backend  # 指定工作目录为 backend 文件夹
+
+      - name: Build Python backend for ${{ matrix.platform }}
+        run: |
+          python pyi_auto_pack_ci.py ${{ matrix.platform }}
+        working-directory: ./backend  # 指定工作目录为 backend 文件夹
+
+      - name: Build Electron app for ${{ matrix.platform }}
+        run: |
+          if [ "${{ matrix.platform }}" == "win" ]; then
+            pnpm run electron-builder --win
+          elif [ "${{ matrix.platform }}" == "mac" ]; then
+            pnpm run electron-builder --mac
+          elif [ "${{ matrix.platform }}" == "linux" ]; then
+            pnpm run electron-builder --linux
+          fi
+        working-directory: ./frontend  # 指定工作目录为 frontend 文件夹
+
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-build
+          path: build/
