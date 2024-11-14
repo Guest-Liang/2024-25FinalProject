@@ -9,13 +9,15 @@ backend, 产物在dist:
 ```conda
 cd backend
 conda activate FinalProject
-pyinstaller manage.spec
+pip install -r requirements.txt
+python pyi_auto_pack.py
 ```
 
 vue前端, 产物在dist:   
 ```npm
 cd frontend
-pnpm build (or pnpm build-only)
+pnpm install
+pnpm build-only
 ```
 
 electron, 产物在build:   

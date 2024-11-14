@@ -1,6 +1,6 @@
 import { app, BrowserWindow, Menu } from 'electron'
 import path from 'path'
-import { execFile, exec } from 'child_process'
+import { exec, spawn } from 'child_process'
 import iconv from 'iconv-lite'
 import fs from 'fs'
 
@@ -10,17 +10,17 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname).slice(1)
 let isDev = process.env.NODE_ENV === 'development'
 let win
 let djangoProcess
-let djangoExePath
-
-function findExeFile(directory) {
-  const files = fs.readdirSync(directory)
-  // start with 'distribution', end by '.exe'
-  const exeFile = files.find(file => /^distribution.*\.exe$/i.test(file))
-  return exeFile ? path.join(directory, exeFile) : null
-}
+let djangoExecutePath
 
 const killDjangoProcess = () => {
-  exec('taskkill -F -IM DjangoRestfulAPI.exe', (error, stdout, stderr) => {
+  let command
+  if (process.platform === 'win32') {
+    command = 'taskkill -F -IM DjangoRestfulAPI.exe'
+  } else {
+    command = 'pkill -f DjangoRestfulAPI'
+  }
+
+  exec(command, (error, stdout, stderr) => {
     if (error) {
       console.error(`[killDjangoProcess] Error killing Django process: ${error}`)
       return
@@ -35,58 +35,79 @@ const killDjangoProcess = () => {
 
 function startDjangoServer() {
   // sometimes use dev mode
-  if (!isDev) {
-    const exeFile = findExeFile(path.join(__dirname, '../APIDataDir'))
-    if (exeFile) {
-      djangoExePath = exeFile
-    } else {
-      console.error('No distribution exe file found in APIDataDir.')
-      win.webContents.send('django-status', { message: 'Django Restful API backend failed to start, application will close in 10 seconds!' })
-      setTimeout(() => {
-        app.quit()
-      }, 10000)
-    }
+  if (process.platform === 'win32') {
+    djangoExecutePath = path.join(
+      __dirname, 
+      isDev ? '../backend/dist/DjangoRestfulAPI.exe' : '../APIDataDir/DjangoRestfulAPI.exe'
+    )
   } else {
-    const exeFile = findExeFile(path.join(__dirname, '../backend/dist'))
-    if (exeFile) {
-      djangoExePath = exeFile
-    } else {
-      console.error('No distribution exe file found in backend/dist.')
-      win.webContents.send('django-status', { message: 'Django Restful API backend failed to start, application will close in 10 seconds!' })
-      setTimeout(() => {
-        app.quit()
-      }, 10000)
-    }
+    djangoExecutePath = path.join(
+      __dirname, 
+      isDev ? '../backend/dist/DjangoRestfulAPI' : '../APIDataDir/DjangoRestfulAPI'
+    )
   }
-  console.log(`[startDjangoServer] Django exe path: ${djangoExePath}`)
 
-  djangoProcess = execFile(djangoExePath, ['runserver', '--noreload'], (error, stdout, stderr) => {
-    if (error || stderr) {
-      console.error(`[django server error] ${error || stderr}`)
-      win.webContents.send('django-status', { message: 'Django Restful API backend failed to start, application will close in 10 seconds!' })
-      setTimeout(() => {
-        app.quit()
-      }, 10000)
-      return
+  console.log(`[startDjangoServer] Django Execute Path: ${djangoExecutePath}`)
+
+  if (!fs.existsSync(djangoExecutePath)) {
+    console.error('No Django backend exe file found.')
+    if (win) {
+      win.webContents.send('django-status', { message: 'Django Restful API backend not found, application will close in 10 seconds!' })
     }
-    console.log(`[django server stdout] ${stdout}`)
-  })
+    setTimeout(() => {
+      app.quit()
+    }, 10000)
+    return
+  }
 
-  djangoProcess.stdout.on('data', (stdout) => {
-    console.log(`[Django server stdout] ${iconv.decode(stdout, 'utf-8')}`)
-  })
+  djangoProcess = spawn(djangoExecutePath, ['runserver', '--noreload'], { stdio: 'inherit'})
 
-  djangoProcess.stderr.on('data', (stderr) => {
-    console.error(`[Django server stderr] ${iconv.decode(stderr, 'utf-8')}`)
-  })
+  if (!djangoProcess) {
+    console.error('Failed to spawn Django process.')
+    if (win) {
+      win.webContents.send('django-status', { message: 'Django Restful API backend fail to spawn, application will close in 10 seconds!' })
+    }
+    setTimeout(() => {
+      app.quit()
+    }, 10000)
+    return
+  }
 
   djangoProcess.on('error', (err) => {
     console.error(`[Django server error] ${err}`)
+    if (win) {
+      win.webContents.send('django-status', { message: 'Django Restful API backend error, application will close in 10 seconds!' })
+    }
+    setTimeout(() => {
+      app.quit()
+    }, 10000)
   })
 
   djangoProcess.on('exit', (code) => {
-    console.log(`Django backend process exited with code ${code}`)
+    if (code !== 0) {
+      console.error(`Django backend process exited with error code ${code}`)
+      if (win) {
+        win.webContents.send('django-status', { message: `Django backend exit, error code: ${code}\napplication will close in 10 seconds!` })
+      }
+      setTimeout(() => {
+        app.quit()
+      }, 10000)
+    } else {
+      console.log('Django backend started successfully.')
+    }
   })
+
+  if (djangoProcess.stdout) {
+    djangoProcess.stdout.on('data', (stdout) => {
+      console.log(`[Django server stdout] ${iconv.decode(stdout, 'utf-8')}`)
+    })
+  }
+
+  if (djangoProcess.stderr) {
+    djangoProcess.stderr.on('data', (stderr) => {
+      console.error(`[Django server stderr] ${iconv.decode(stderr, 'utf-8')}`)
+    })
+  }
 }
 
 function createWindow() {
@@ -119,98 +140,37 @@ function createWindow() {
     {
       label: 'File',
       submenu: [
-        {
-          label: 'Open',
-          click: () => {
-            console.log('Open clicked')
-          }
-        },
-        {
-          label: 'Save',
-          click: () => {
-            console.log('Save clicked')
-          }
-        },
-        {
-          type: 'separator'
-        },
-        {
-          label: 'Exit',
-          role: 'quit'
-        }
+        { label: 'Open', click: () => console.log('Open clicked') },
+        { label: 'Save', click: () => console.log('Save clicked') },
+        { type: 'separator' },
+        { label: 'Exit', role: 'quit' }
       ]
     },
     {
       label: 'Edit',
       submenu: [
-        {
-          label: 'Undo',
-          role: 'undo'
-        },
-        {
-          label: 'Redo',
-          role: 'redo'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          label: 'Cut',
-          role: 'cut'
-        },
-        {
-          label: 'Copy',
-          role: 'copy'
-        },
-        {
-          label: 'Paste',
-          role: 'paste'
-        }
+        { label: 'Undo', role: 'undo' },
+        { label: 'Redo', role: 'redo' },
+        { type: 'separator' },
+        { label: 'Cut', role: 'cut' },
+        { label: 'Copy', role: 'copy' },
+        { label: 'Paste', role: 'paste' }
       ]
     },
     {
       label: 'View',
       submenu: [
-        {
-          label: 'Reload',
-          accelerator: 'Ctrl+R',
-          click: () => {
-            win.reload()  // 重新加载窗口
-          }
-        },
-        {
-          label: 'Toggle Developer Tools',
-          accelerator: 'Ctrl+Shift+I',
-          click: () => {
-            win.webContents.toggleDevTools()  // 打开开发者工具
-          }
-        },
-        {
-          label: 'Actual Size',
-          accelerator: 'Ctrl+0',
-          role: 'resetzoom'
-        },
-        {
-          label: 'Zoom In',
-          accelerator: 'Ctrl+Plus',
-          role: 'zoomin'
-        },
-        {
-          label: 'Zoom Out',
-          accelerator: 'Ctrl+-',
-          role: 'zoomout'
-        }
+        { label: 'Reload', accelerator: 'Ctrl+R', click: () => win.reload() },
+        { label: 'Toggle Developer Tools', accelerator: 'Ctrl+Shift+I', click: () => win.webContents.toggleDevTools() },
+        { label: 'Actual Size', accelerator: 'Ctrl+0', role: 'resetzoom' },
+        { label: 'Zoom In', accelerator: 'Ctrl+Plus', role: 'zoomin' },
+        { label: 'Zoom Out', accelerator: 'Ctrl+-', role: 'zoomout' }
       ]
     },
     {
       label: 'Help',
       submenu: [
-        {
-          label: 'Learn More',
-          click: () => {
-            console.log('Learn More clicked')
-          }
-        }
+        { label: 'Learn More', click: () => console.log('Learn More clicked') }
       ]
     }
   ]
@@ -227,12 +187,14 @@ app.whenReady().then(() => {
   createWindow()
   
   win.on('closed', () => {
-    if (djangoProcess) {
-      djangoProcess.kill()
-      console.log('[win.onclose] Django backend process killed.')
+    if (win) {
+      if (djangoProcess) {
+        djangoProcess.kill()
+        console.log('[win.onclose] Django backend process killed.')
+      }
+      killDjangoProcess()
+      console.log('[win.onclose] Django exe process killed.')
     }
-    killDjangoProcess()
-    console.log('[win.onclose] Django exe process killed.')
   })
 
   // listen SIGINT (Ctrl+C)

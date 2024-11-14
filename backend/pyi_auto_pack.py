@@ -4,9 +4,9 @@ import datetime
 import time
 import os
 
-Version = "v0.1.1"
+Version = "v0.1.2"
 AppName = "DjangoRestfulAPI"
-FileName = f"distribution-{Version}-DjangoRestfulAPI"
+FileName = "DjangoRestfulAPI"
 VersionFileName = "version_autogen.txt"
 
 match = re.match(r"v(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?", Version)
@@ -36,7 +36,7 @@ VSVersionInfo(
                     '040904B0',
                     [
                         StringStruct('CompanyName', 'GuestLiang'),
-                        StringStruct('FileDescription', '{AppName} works on Port 8000'),
+                        StringStruct('FileDescription', '{AppName} {Version}'),
                         StringStruct('FileVersion', '{Version}'),
                         StringStruct('InternalName', '{AppName}'),
                         StringStruct('LegalCopyright', '2024 © GuestLiang'),
