@@ -14,6 +14,7 @@
   ],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "./",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
   }
 }

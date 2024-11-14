@@ -2,6 +2,7 @@ import { app, BrowserWindow, Menu } from 'electron'
 import path from 'path'
 import { execFile, exec } from 'child_process'
 import iconv from 'iconv-lite'
+import fs from 'fs'
 
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname).slice(1)
@@ -11,6 +12,12 @@ let win
 let djangoProcess
 let djangoExePath
 
+function findExeFile(directory) {
+  const files = fs.readdirSync(directory)
+  // start with 'distribution', end by '.exe'
+  const exeFile = files.find(file => /^distribution.*\.exe$/i.test(file))
+  return exeFile ? path.join(directory, exeFile) : null
+}
 
 const killDjangoProcess = () => {
   exec('taskkill -F -IM DjangoRestfulAPI.exe', (error, stdout, stderr) => {
@@ -29,10 +36,29 @@ const killDjangoProcess = () => {
 function startDjangoServer() {
   // sometimes use dev mode
   if (!isDev) {
-    djangoExePath = path.join(__dirname, '../APIDataDir/DjangoRestfulAPI.exe')
+    const exeFile = findExeFile(path.join(__dirname, '../APIDataDir'))
+    if (exeFile) {
+      djangoExePath = exeFile
+    } else {
+      console.error('No distribution exe file found in APIDataDir.')
+      win.webContents.send('django-status', { message: 'Django Restful API backend failed to start, application will close in 10 seconds!' })
+      setTimeout(() => {
+        app.quit()
+      }, 10000)
+    }
   } else {
-    djangoExePath = path.join(__dirname, '../backend/dist/DjangoRestfulAPI.exe')
+    const exeFile = findExeFile(path.join(__dirname, '../backend/dist'))
+    if (exeFile) {
+      djangoExePath = exeFile
+    } else {
+      console.error('No distribution exe file found in backend/dist.')
+      win.webContents.send('django-status', { message: 'Django Restful API backend failed to start, application will close in 10 seconds!' })
+      setTimeout(() => {
+        app.quit()
+      }, 10000)
+    }
   }
+  console.log(`[startDjangoServer] Django exe path: ${djangoExePath}`)
 
   djangoProcess = execFile(djangoExePath, ['runserver', '--noreload'], (error, stdout, stderr) => {
     if (error || stderr) {
