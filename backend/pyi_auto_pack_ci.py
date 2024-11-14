@@ -7,25 +7,26 @@ import platform
 import sys
 
 # Read arguments from command line for platform-specific builds
-platform_arg = sys.argv[1] if len(sys.argv) > 1 else None
+PlatformArg = sys.argv[1] if len(sys.argv) > 1 else None
 
-# Check for Windows or GitHub Actions
-isWindows = platform.system() == 'Windows'
+# Check for GitHub Actions
 isGithubActions = os.environ.get('CI', 'false') == 'true'
 
+# Basic app info
 Version = "v0.1.1"
 AppName = "DjangoRestfulAPI"
 FileName = "DjangoRestfulAPI"
 VersionFileName = "version_autogen.txt"
 
+# Parse version number
 match = re.match(r"v(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?", Version)
-
 if match:
     major, minor, patch, build = match.groups()
-    build = build if build is not None else "0"  # build defaults to 0
+    build = build if build is not None else "0"
 else:
     raise ValueError("Invalid version format")
 
+# Version data to include in the build
 VersionData = f'''
 VSVersionInfo(
     ffi=FixedFileInfo(
@@ -53,6 +54,7 @@ VSVersionInfo(
 )
 '''
 
+# Write version data to a file
 try:
     with open(VersionFileName, "w", encoding="utf-8") as f:
         f.write(VersionData)
@@ -60,6 +62,7 @@ except Exception as e:
     print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Error writing file:', e)
     exit(0)
 
+# Log version creation
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Version file created successfully')
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Waiting for 5 seconds...')
 time.sleep(5)
@@ -67,63 +70,76 @@ time.sleep(5)
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] The version for this build is: {Version}')
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Running PyInstaller...')
 
-# Build Python backend
-Targets = []
-if isGithubActions:
-    print("[INFO] Running in GitHub Actions. Building for all platforms.")
-    Targets = [
-        {'platform': 'win32', 'distpath': 'dist/windows'},
-        {'platform': 'linux', 'distpath': 'dist/linux'},
-        {'platform': 'darwin', 'distpath': 'dist/macos_intel', 'arch': 'x86_64'},  # Intel (x64)
-        {'platform': 'darwin', 'distpath': 'dist/macos_arm', 'arch': 'arm64'}     # ARM (Apple Silicon)
-    ]
-elif platform_arg == 'win':
-    print("[INFO] Building for Windows only.")
-    Targets = [{'platform': 'win32', 'distpath': 'dist/windows'}]
-elif platform_arg == 'mac':
-    print("[INFO] Building for macOS only.")
-    Targets = [{'platform': 'darwin', 'distpath': 'dist/macos'}]
-elif platform_arg == 'linux':
-    print("[INFO] Building for Linux only.")
-    Targets = [{'platform': 'linux', 'distpath': 'dist/linux'}]
+# Define platform-specific configurations in a dictionary
+platforms = {
+    'win': {'distpath': 'dist/windows', 'platform': 'win32'},
+    'mac': {'distpath': 'dist/macos', 'platform': 'darwin', 'archs': ['x86_64', 'arm64']},
+    'linux': {'distpath': 'dist/linux', 'platform': 'linux'}
+}
+
+# Check platform argument and construct the necessary build arguments
+if PlatformArg in platforms:
+    print(f"[INFO] Building for {PlatformArg.capitalize()}.")
+    config = platforms[PlatformArg]
+
+    if PlatformArg == 'mac':
+        # For macOS, we need to handle both x86_64 and arm64 architectures
+        for arch in config['archs']:
+            args = [
+                'manage.py',
+                f'--name={FileName}',
+                '--onefile',  # Single executable file
+                '--console',  # Console output
+                '--hidden-import=django.contrib.admin',
+                '--hidden-import=django.contrib.auth',
+                '--hidden-import=django.contrib.contenttypes',
+                '--hidden-import=django.contrib.sessions',
+                '--hidden-import=django.contrib.messages',
+                '--hidden-import=django.contrib.staticfiles',
+                '--hidden-import=rest_framework',
+                '--hidden-import=api',
+                '--hidden-import=corsheaders',
+                '--add-data=storage:storage',
+                '--add-data=transit:transit',
+                '--add-data=pic:pic',
+                f'--version-file={VersionFileName}',
+                '--distpath', config['distpath'],
+                '--workpath', 'build',
+                f'--arch={arch}'  # Architecture
+            ]
+            print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Building for macOS with architecture {arch}')
+            PyInstaller.__main__.run(args)
+    else:
+        # For other platforms (win, linux), build once
+        args = [
+            'manage.py',
+            f'--name={FileName}',
+            '--onefile',  # Single executable file
+            '--console',  # Console output
+            '--hidden-import=django.contrib.admin',
+            '--hidden-import=django.contrib.auth',
+            '--hidden-import=django.contrib.contenttypes',
+            '--hidden-import=django.contrib.sessions',
+            '--hidden-import=django.contrib.messages',
+            '--hidden-import=django.contrib.staticfiles',
+            '--hidden-import=rest_framework',
+            '--hidden-import=api',
+            '--hidden-import=corsheaders',
+            '--add-data=storage:storage',
+            '--add-data=transit:transit',
+            '--add-data=pic:pic',
+            f'--version-file={VersionFileName}',
+            '--distpath', config['distpath'],
+            '--workpath', 'build',
+        ]
+        print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Building for platform: {PlatformArg}')
+        PyInstaller.__main__.run(args)
 else:
-    print("[INFO] Invalid platform specified. Exiting...")
+    print(f"[INFO] Invalid platform specified: {PlatformArg}. Exiting...")
     exit(1)
 
-for Target in Targets:
-    args = [
-        'manage.py',
-        f'--name={FileName}',
-        '--onefile',  # Single executable file
-        '--console',  # Console output
-        '--hidden-import=django.contrib.admin',
-        '--hidden-import=django.contrib.auth',
-        '--hidden-import=django.contrib.contenttypes',
-        '--hidden-import=django.contrib.sessions',
-        '--hidden-import=django.contrib.messages',
-        '--hidden-import=django.contrib.staticfiles',
-        '--hidden-import=rest_framework',
-        '--hidden-import=api',
-        '--hidden-import=corsheaders',
-        '--add-data=storage:storage',
-        '--add-data=transit:transit',
-        '--add-data=pic:pic',
-        f'--version-file={VersionFileName}',
-        '--distpath', Target['distpath'],
-        '--workpath', 'build',
-    ]
-
-    if Target['platform'] == 'win32':
-        args.append('--platform=win32')
-    elif Target['platform'] == 'linux':
-        args.append('--platform=linux')
-    elif Target['platform'] == 'darwin':
-        args.append('--platform=darwin')
-        if 'arch' in Target:
-            args.append(f'--arch={Target["arch"]}')
-
-    print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Building for platform: {Target["platform"]} with arch: {Target.get("arch", "default")}')
-    PyInstaller.__main__.run(args)
-
+# Clean up spec file
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] PyInstaller finished, cleaning spec file...')
 os.remove(f"{FileName}.spec")
+
+print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] All done, exiting...')
