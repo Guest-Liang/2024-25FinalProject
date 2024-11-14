@@ -135,6 +135,7 @@ if PlatformArg in platforms:
             f'--version-file={VersionFileName}',
             '--distpath', config['distpath'],
             '--workpath', 'build',
+            '--noconfirm',
         ]
         print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Building for platform: {PlatformArg}')
         PyInstaller.__main__.run(args)
