@@ -1,5 +1,5 @@
 # config files
-config
+config/testfile
 
 **/__pycache__
 **/node_modules
@@ -8,5 +8,6 @@ config
 
 /backend/Anaconda PowerShell Prompt.lnk
 /backend/transit/testfile
+/backend/config
 /backend/build
 /backend/dist

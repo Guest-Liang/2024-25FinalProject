@@ -2,7 +2,7 @@ name: Test Electron Build
 
 on:
   workflow_dispatch:
-  
+
   push:
     branches:
       - test-ci
@@ -85,4 +85,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: electron-build-${{ matrix.platform }}-${{ matrix.os }}
-          path: build/
+          path: |
+            ./frontend/build/*.exe
+            ./frontend/build/*.zip
+            ./backend/dist/*.exe
