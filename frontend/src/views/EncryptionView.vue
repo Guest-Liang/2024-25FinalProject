@@ -109,21 +109,20 @@ const isValidEmail = (email: string) => {
 }
 
 const handleEncryptFileRemove = (file: File) => {
-  const index = encryptFileList.value.indexOf(file);
+  const index = encryptFileList.value.indexOf(file)
   if (index > -1) {
-    encryptFileList.value.splice(index, 1);
+    encryptFileList.value.splice(index, 1)
   }
-  console.log(`Removed file: ${file.name}`);
+  console.log(`Removed file: ${file.name}`)
 }
 
 const handleCustomFileRemove = (file: File) => {
-  const index = customImageList.value.indexOf(file);
+  const index = customImageList.value.indexOf(file)
   if (index > -1) {
-    customImageList.value.splice(index, 1);
+    customImageList.value.splice(index, 1)
   }
-  console.log(`Removed custom image: ${file.name}`);
+  console.log(`Removed custom image: ${file.name}`)
 }
-
 
 const cleanUploadFiles = () => {
   encryptFileList.value = []
