@@ -6,6 +6,10 @@ import os
 import platform
 import sys
 
+os.environ['DJANGO_SETTINGS_MODULE'] = 'django_project.settings'
+from django.conf import settings
+settings.configure()
+
 # Read arguments from command line for platform-specific builds
 PlatformArg = sys.argv[1] if len(sys.argv) > 1 else None
 
