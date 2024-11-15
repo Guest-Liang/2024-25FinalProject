@@ -13,8 +13,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - platform: win
-            os: windows-latest
+          # - platform: win
+          #   os: windows-latest
 
           - platform: linux
             os: ubuntu-latest
@@ -110,6 +110,13 @@ jobs:
             mv ./frontend/build/*.AppImage ./upload/
             mkdir -p ./upload/config
             mv ./config/*.yaml ./upload/config
+
+            for appimage in ./upload/*.AppImage; do
+              temp_dir=$(mktemp -d)
+              bsdtar -xf "$appimage" -C "$temp_dir"
+              tar -czvf "${appimage%.AppImage}.tar.gz" -C "$temp_dir" .
+              rm -rf "$temp_dir"
+            done
           fi
         working-directory: .
 

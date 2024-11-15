@@ -8,7 +8,7 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
-    with open("./config/config.yaml", "r") as file:
+    with open("../config/config.yaml", "r") as file:
         CONFIG_YAML = yaml.safe_load(file)
 else: 
     with open(os.path.join(settings.BASE_DIR, "./config/config.yaml"), "r") as file:
