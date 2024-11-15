@@ -65,20 +65,23 @@ jobs:
           export BACKEND_PATH
 
           node -e "
-          const fs = require('fs')
-          const path = require('path')
-          const isLinux = process.env.BACKEND_PATH === '../backend/dist/linux/'
-          const packageJsonPath = './frontend/package.json'
-          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+          const fs = require('fs');
+          const path = require('path');
+          const backendPath = process.env.BACKEND_PATH;
+          const packageJsonPath = './frontend/package.json';
+          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
-          packageJson.build.extraResources = isLinux
-          ? [{ from: '../config/', to: 'config', filter: ['*.yaml'] }]
-          : [
-              { "from": "../backend/dist/pic", "to": "APIDataDir/pic" },
-              { "from": "../backend/dist/windows", "to": "APIDataDir" },
-              { "from": "../config/", "to": "APIDataDir/config", "filter": [ "*.yaml" ] }
+          if (backendPath === '../backend/dist/linux/') {
+            packageJson.build.extraResources = [
+              { from: '../config/', to: 'config', filter: ['*.yaml'] }
             ]
-
+          } else {
+            packageJson.build.extraResources = [
+              { from: '../backend/dist/pic', to: 'APIDataDir/pic' },
+              { from: backendPath, to: 'APIDataDir' },
+              { from: '../config/', to: 'APIDataDir/config', filter: ['*.yaml'] }
+            ]
+          }
           fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
           "
         env:
