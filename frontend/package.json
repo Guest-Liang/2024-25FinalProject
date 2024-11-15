@@ -5,7 +5,7 @@
   "type": "module",
   "main": "main.mjs",
   "description": "GuestLiang's frontend project, build with electron.",
-  "author": "GuestLiang",
+  "author": "GuestLiang <GuestLiang@outlook.com>",
   "license": "MIT",
   "scripts": {
     "dev": "vite",
@@ -91,10 +91,7 @@
       "deleteAppDataOnUninstall": true
     },
     "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ],
+      "target": "AppImage",
       "category": "Utility"
     }
   }
