@@ -55,6 +55,7 @@ jobs:
         working-directory: ./backend
 
       - name: Modify package.json for platform-specific resources
+        shell: bash
         run: |
           if [ "${{ matrix.platform }}" == "win" ]; then
             BACKEND_PATH="../backend/dist/windows/"
@@ -73,8 +74,9 @@ jobs:
           packageJson.build.extraResources = isLinux
           ? [{ from: '../config/', to: 'config', filter: ['*.yaml'] }]
           : [
-              { from: process.env.BACKEND_PATH, to: 'APIDataDir' },
-              { from: '../config/', to: 'config', filter: ['*.yaml'] }
+              { "from": "../backend/dist/pic", "to": "APIDataDir/pic" },
+              { "from": "../backend/dist/windows", "to": "APIDataDir" },
+              { "from": "../config/", "to": "APIDataDir/config", "filter": [ "*.yaml" ] }
             ]
 
           fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
@@ -98,12 +100,12 @@ jobs:
         run: |
           mkdir -p ./upload
           if [ "${{ matrix.platform }}" == "win" ]; then
-            mv ./backend/dist/windows/* ./upload/
             mv ./frontend/build/*.exe ./upload/
             mv ./frontend/build/*.zip ./upload/
           elif [ "${{ matrix.platform }}" == "linux" ]; then
             mv ./backend/dist/linux/* ./upload/
             mv ./frontend/build/*.AppImage ./upload/
+            my ./config/config.yaml ./upload/
           fi
         working-directory: .
 

@@ -61,12 +61,16 @@
     ],
     "extraResources": [
       {
-        "from": "../backend/dist/",
+        "from": "../backend/dist/pic",
+        "to": "APIDataDir/pic"
+      },
+      {
+        "from": "../backend/dist/windows",
         "to": "APIDataDir"
       },
       {
         "from": "../config/",
-        "to": "config",
+        "to": "APIDataDir/config",
         "filter": [
           "*.yaml"
         ]
