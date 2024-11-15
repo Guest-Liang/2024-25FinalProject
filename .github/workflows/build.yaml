@@ -108,4 +108,5 @@ jobs:
           path: |
             ./frontend/build/*.exe
             ./frontend/build/*.zip
+            ./frontend/build/*.AppImage
             ./backend/dist/
