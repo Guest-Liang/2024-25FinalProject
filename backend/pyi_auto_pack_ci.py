@@ -3,7 +3,6 @@ import re
 import datetime
 import time
 import os
-import platform
 import sys
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_project.settings'
@@ -76,8 +75,8 @@ except Exception as e:
 
 # Log version creation
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Version file created successfully')
-print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Waiting for 5 seconds...')
-time.sleep(5)
+print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Waiting for 1 seconds...')
+time.sleep(1)
 
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] The version for this build is: {Version}')
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Running PyInstaller...')
@@ -85,7 +84,6 @@ print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Running PyInst
 # Define platform-specific configurations in a dictionary
 platforms = {
     'win': {'distpath': 'dist/windows', 'platform': 'win32'},
-    'mac': {'distpath': 'dist/macos', 'platform': 'darwin'},
     'linux': {'distpath': 'dist/linux', 'platform': 'linux'}
 }
 

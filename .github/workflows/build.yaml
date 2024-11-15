@@ -19,12 +19,6 @@ jobs:
           - platform: linux
             os: ubuntu-latest
 
-          # - platform: mac
-          #   os: macos-11
-
-          # - platform: mac
-          #   os: macos-12
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -66,21 +60,25 @@ jobs:
             BACKEND_PATH="../backend/dist/windows/"
           elif [ "${{ matrix.platform }}" == "linux" ]; then
             BACKEND_PATH="../backend/dist/linux/"
-          elif [ "${{ matrix.platform }}" == "mac" ]; then
-            BACKEND_PATH="../backend/dist/mac/"
           fi
           export BACKEND_PATH
 
           node -e "
-          const fs = require('fs');
-          const backendPath = process.env.BACKEND_PATH;
-          const packageJson = JSON.parse(fs.readFileSync('./frontend/package.json', 'utf8'));
-          packageJson.build.extraResources = [
-            { from: backendPath, to: 'APIDataDir' },
-            { from: '../config/', to: 'config', filter: ['*.yaml'] }
-          ];
-          fs.writeFileSync('./frontend/package.json', JSON.stringify(packageJson, null, 2));
-          " 
+          const fs = require('fs')
+          const path = require('path')
+          const isLinux = process.env.BACKEND_PATH === '../backend/dist/linux/'
+          const packageJsonPath = './frontend/package.json'
+          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+
+          packageJson.build.extraResources = isLinux
+          ? [{ from: '../config/', to: 'config', filter: ['*.yaml'] }]
+          : [
+              { from: process.env.BACKEND_PATH, to: 'APIDataDir' },
+              { from: '../config/', to: 'config', filter: ['*.yaml'] }
+            ]
+
+          fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
+          "
         env:
           BACKEND_PATH: ${{ env.BACKEND_PATH }}
 
@@ -90,23 +88,27 @@ jobs:
           echo "Building Electron app for ${{ matrix.platform }} on ${{ matrix.os }}"
           if [ "${{ matrix.platform }}" == "win" ]; then
             pnpm electron-builder --win
-          elif [ "${{ matrix.platform }}" == "mac" ]; then
-            if [ "${{ matrix.os }}" == "macos-11" ]; then
-              pnpm electron-builder --mac --x64  # 针对 x86_64
-            elif [ "${{ matrix.os }}" == "macos-12" ]; then
-              pnpm electron-builder --mac --arm64  # 针对 arm64
-            fi
           elif [ "${{ matrix.platform }}" == "linux" ]; then
             pnpm electron-builder --linux
           fi
         working-directory: ./frontend
 
+
+      - name: Organize files for upload
+        run: |
+          mkdir -p ./upload
+          if [ "${{ matrix.platform }}" == "win" ]; then
+            mv ./backend/dist/windows/* ./upload/
+            mv ./frontend/build/*.exe ./upload/
+            mv ./frontend/build/*.zip ./upload/
+          elif [ "${{ matrix.platform }}" == "linux" ]; then
+            mv ./backend/dist/linux/* ./upload/
+            mv ./frontend/build/*.AppImage ./upload/
+          fi
+        working-directory: .
+
       - name: Upload build artifacts for ${{ matrix.platform }} on ${{ matrix.os }}
         uses: actions/upload-artifact@v4
         with:
           name: electron-build-${{ matrix.platform }}-${{ matrix.os }}
-          path: |
-            ./frontend/build/*.exe
-            ./frontend/build/*.zip
-            ./frontend/build/*.AppImage
-            ./backend/dist/
+          path: ./upload

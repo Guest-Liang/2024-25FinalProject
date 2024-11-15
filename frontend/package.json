@@ -75,9 +75,6 @@
     "directories": {
       "output": "build"
     },
-    "mac": {
-      "category": "public.app-category.utilities"
-    },
     "win": {
       "target": [
         "nsis",

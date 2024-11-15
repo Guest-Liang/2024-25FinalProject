@@ -38,13 +38,16 @@ function startDjangoServer() {
   if (process.platform === 'win32') {
     djangoExecutePath = path.join(
       __dirname, 
-      isDev ? '../backend/dist/DjangoRestfulAPI.exe' : '../APIDataDir/DjangoRestfulAPI.exe'
+      isDev ? '../backend/dist/windows/DjangoRestfulAPI.exe' : '../APIDataDir/DjangoRestfulAPI.exe'
+    )
+  } else if (process.platform === 'linux') {
+    djangoExecutePath = path.join(
+      isDev ? path.join(__dirname, '../backend/dist/linux/') : path.dirname(process.argv[0]),
+      'DjangoRestfulAPI'
     )
   } else {
-    djangoExecutePath = path.join(
-      __dirname, 
-      isDev ? '../backend/dist/DjangoRestfulAPI' : '../APIDataDir/DjangoRestfulAPI'
-    )
+    console.log('Unsupported platform.')
+    exit(1)
   }
 
   console.log(`[startDjangoServer] Django Execute Path: ${djangoExecutePath}`)
