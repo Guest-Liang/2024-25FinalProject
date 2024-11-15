@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "main": "main.mjs",
-  "description": "GuestLiang's frontend project, build with electron.",
-  "author": "GuestLiang <GuestLiang@outlook.com>",
+  "description": "GuestLiang's Project Frontend",
+  "homepage": "https://github.com/Guest-Liang",
+  "author": "Guest Liang <GuestLiang@outlook.com>",
   "license": "MIT",
   "scripts": {
     "dev": "vite",
@@ -60,12 +61,16 @@
     ],
     "extraResources": [
       {
-        "from": "../backend/dist/",
+        "from": "../backend/dist/pic",
+        "to": "APIDataDir/pic"
+      },
+      {
+        "from": "../backend/dist/windows",
         "to": "APIDataDir"
       },
       {
         "from": "../config/",
-        "to": "config",
+        "to": "APIDataDir/config",
         "filter": [
           "*.yaml"
         ]
@@ -73,9 +78,6 @@
     ],
     "directories": {
       "output": "build"
-    },
-    "mac": {
-      "category": "public.app-category.utilities"
     },
     "win": {
       "target": [
@@ -91,7 +93,12 @@
       "deleteAppDataOnUninstall": true
     },
     "linux": {
-      "target": "AppImage",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        }
+      ],
       "category": "Utility"
     }
   }

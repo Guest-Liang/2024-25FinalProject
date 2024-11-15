@@ -1,0 +1,127 @@
+name: Test Electron Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - test-ci
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}  # 使用 matrix 中的 os 配置来指定不同的运行环境
+
+    strategy:
+      matrix:
+        include:
+          - platform: win
+            os: windows-latest
+
+          - platform: linux
+            os: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+
+      - name: Install pnpm
+        run: |
+          npm install -g pnpm
+
+      - name: Install frontend dependencies and build # vue 构建
+        run: |
+          pnpm install
+          pnpm run build-only
+        working-directory: ./frontend
+
+      - name: Set up Python environment  # 设置 Python 环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install backend Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: ./backend
+
+      - name: Build Python backend for ${{ matrix.platform }}
+        run: |
+          python pyi_auto_pack_ci.py ${{ matrix.platform }}
+        working-directory: ./backend
+
+      - name: Modify package.json for platform-specific resources
+        shell: bash
+        run: |
+          if [ "${{ matrix.platform }}" == "win" ]; then
+            BACKEND_PATH="../backend/dist/windows/"
+          elif [ "${{ matrix.platform }}" == "linux" ]; then
+            BACKEND_PATH="../backend/dist/linux/"
+          fi
+          export BACKEND_PATH
+
+          node -e "
+          const fs = require('fs');
+          const path = require('path');
+          const backendPath = process.env.BACKEND_PATH;
+          const packageJsonPath = './frontend/package.json';
+          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+
+          if (backendPath === '../backend/dist/linux/') {
+            packageJson.build.extraResources = [
+              { from: '../config/', to: 'config', filter: ['*.yaml'] }
+            ]
+          } else {
+            packageJson.build.extraResources = [
+              { from: '../backend/dist/pic', to: 'APIDataDir/pic' },
+              { from: backendPath, to: 'APIDataDir' },
+              { from: '../config/', to: 'APIDataDir/config', filter: ['*.yaml'] }
+            ]
+          }
+          fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
+          "
+        env:
+          BACKEND_PATH: ${{ env.BACKEND_PATH }}
+
+      - name: Build Electron app for ${{ matrix.platform }}
+        shell: bash      
+        run: |
+          echo "Building Electron app for ${{ matrix.platform }} on ${{ matrix.os }}"
+          if [ "${{ matrix.platform }}" == "win" ]; then
+            pnpm electron-builder --win
+          elif [ "${{ matrix.platform }}" == "linux" ]; then
+            pnpm electron-builder --linux
+          fi
+        working-directory: ./frontend
+
+      - name: Organize files for upload
+        shell: bash
+        run: |
+          mkdir -p ./upload
+          if [ "${{ matrix.platform }}" == "win" ]; then
+            mv ./frontend/build/*.exe ./upload/
+            mv ./frontend/build/*.zip ./upload/
+          elif [ "${{ matrix.platform }}" == "linux" ]; then
+            appimage=$(find ./frontend/build -name "*.AppImage")
+            mv "$appimage" ./upload/
+
+            temp_dir=$(mktemp -d)
+            7z x "./upload/$(basename "$appimage")" -o"$temp_dir"
+
+            mv ./backend/dist/linux/* "$temp_dir/resources/"
+            tar -czvf "./upload/$(basename "${appimage%.AppImage}.tar.gz")" -C "$temp_dir" .
+
+            rm -rf "$temp_dir"
+            rm ./upload/*.AppImage
+          fi
+        working-directory: .
+
+      - name: Upload build artifacts for ${{ matrix.platform }} on ${{ matrix.os }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-build-${{ matrix.platform }}-${{ matrix.os }}
+          path: ./upload

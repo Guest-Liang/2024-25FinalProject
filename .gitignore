@@ -1,5 +1,5 @@
 # config files
-config/testfile
+testfile
 
 **/__pycache__
 **/node_modules
