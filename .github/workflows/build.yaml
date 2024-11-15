@@ -63,11 +63,11 @@ jobs:
       - name: Modify package.json for platform-specific resources
         run: |
           if [ "${{ matrix.platform }}" == "win" ]; then
-            BACKEND_PATH="../backend/dist/windows/*"
+            BACKEND_PATH="../backend/dist/windows/"
           elif [ "${{ matrix.platform }}" == "linux" ]; then
-            BACKEND_PATH="../backend/dist/linux/*"
+            BACKEND_PATH="../backend/dist/linux/"
           elif [ "${{ matrix.platform }}" == "mac" ]; then
-            BACKEND_PATH="../backend/dist/mac/*"
+            BACKEND_PATH="../backend/dist/mac/"
           fi
           export BACKEND_PATH
 
