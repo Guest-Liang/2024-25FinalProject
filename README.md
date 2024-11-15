@@ -31,9 +31,15 @@ windows 安装版，或者免安装版
 无论哪种都需要一个控制台，所以双击启动会有一个无输出的控制台弹出，不要关闭   
 通过控制台启动，可以看到错误信息   
 
-ubuntu 免安装版   
-解压tar.gz，在控制台运行
+ubuntu 免安装版 以0.2.1版本为例      
+解压tar.gz   
 ```bash
+mkdir App
+tar -zxvf GuestLiangElectronApp-0.2.1.tar.gz -C ./App 
+```
+在控制台运行
+```bash
+cd ./App
 ./guestliang-electron-app --no-sandbox --disable-gpu
 ```
 
