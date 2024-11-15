@@ -16,8 +16,8 @@ jobs:
           - platform: win
             os: windows-latest
 
-          # - platform: linux
-          #   os: ubuntu-latest
+          - platform: linux
+            os: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -100,6 +100,7 @@ jobs:
 
 
       - name: Organize files for upload
+        shell: bash
         run: |
           mkdir -p ./upload
           if [ "${{ matrix.platform }}" == "win" ]; then
