@@ -90,8 +90,7 @@
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "deleteAppDataOnUninstall": true,
-      "include": "installer.nsh"
+      "deleteAppDataOnUninstall": true
     },
     "linux": {
       "target": [
