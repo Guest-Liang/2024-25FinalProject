@@ -12,8 +12,6 @@
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "electron": "cross-env NODE_ENV=development npx electron .",
-    "electronbuild:win": "cross-env NODE_ENV=production npx electron-builder --win",
-    "electronbuild:linux": "cross-env NODE_ENV=production npx electron-builder --linux",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
@@ -94,10 +92,8 @@
       "deleteAppDataOnUninstall": true
     },
     "linux": {
-      "target": [
-        "AppImage"
-      ],
-      "category": "Utility"
+      "target": "AppImage",
+      "arch": "x64"
     }
   }
 }
