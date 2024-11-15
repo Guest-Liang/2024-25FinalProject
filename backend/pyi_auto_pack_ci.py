@@ -48,11 +48,11 @@ VSVersionInfo(
                 StringTable(
                     '040904B0', 
                     [
-                        StringStruct('CompanyName', 'GuestLiang'),
+                        StringStruct('CompanyName', 'Guest Liang'),
                         StringStruct('FileDescription', '{AppName} {Version}'),
                         StringStruct('FileVersion', '{Version}'),
                         StringStruct('InternalName', '{AppName}'),
-                        StringStruct('LegalCopyright', '2024 © GuestLiang'),
+                        StringStruct('LegalCopyright', '2024 © Guest Liang'),
                         StringStruct('OriginalFilename', '{AppName}.exe'),
                         StringStruct('ProductName', 'GuestLiang Django Restful API'),
                         StringStruct('ProductVersion', '{Version}')

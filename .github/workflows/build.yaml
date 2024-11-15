@@ -98,7 +98,6 @@ jobs:
           fi
         working-directory: ./frontend
 
-
       - name: Organize files for upload
         shell: bash
         run: |
@@ -109,7 +108,8 @@ jobs:
           elif [ "${{ matrix.platform }}" == "linux" ]; then
             mv ./backend/dist/linux/* ./upload/
             mv ./frontend/build/*.AppImage ./upload/
-            mv ./config/config.yaml ./upload/
+            mkdir -p ./upload/config
+            mv ./config/*.yaml ./upload/config
           fi
         working-directory: .
 

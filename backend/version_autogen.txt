@@ -16,11 +16,11 @@ VSVersionInfo(
                 StringTable(
                     '040904B0', 
                     [
-                        StringStruct('CompanyName', 'GuestLiang'),
+                        StringStruct('CompanyName', 'Guest Liang'),
                         StringStruct('FileDescription', 'DjangoRestfulAPI v0.1.1'),
                         StringStruct('FileVersion', 'v0.1.1'),
                         StringStruct('InternalName', 'DjangoRestfulAPI'),
-                        StringStruct('LegalCopyright', '2024 © GuestLiang'),
+                        StringStruct('LegalCopyright', '2024 © Guest Liang'),
                         StringStruct('OriginalFilename', 'DjangoRestfulAPI.exe'),
                         StringStruct('ProductName', 'GuestLiang Django Restful API'),
                         StringStruct('ProductVersion', 'v0.1.1')
