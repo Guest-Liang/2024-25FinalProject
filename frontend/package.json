@@ -94,7 +94,8 @@
           "target": "AppImage",
           "arch": ["x64"]
         }
-      ]
+      ],
+      "category": "Utility"
     }
   }
 }

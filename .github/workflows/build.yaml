@@ -13,11 +13,11 @@ jobs:
     strategy:
       matrix:
         include:
-          # - platform: win
-          #   os: windows-latest
+          - platform: win
+            os: windows-latest
 
-          - platform: linux
-            os: ubuntu-latest
+          # - platform: linux
+          #   os: ubuntu-latest
 
     steps:
       - name: Checkout code
