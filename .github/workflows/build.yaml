@@ -106,17 +106,17 @@ jobs:
             mv ./frontend/build/*.exe ./upload/
             mv ./frontend/build/*.zip ./upload/
           elif [ "${{ matrix.platform }}" == "linux" ]; then
-            mv ./backend/dist/linux/* ./upload/
-            mv ./frontend/build/*.AppImage ./upload/
-            mkdir -p ./upload/config
-            mv ./config/*.yaml ./upload/config
+            appimage=$(find ./frontend/build -name "*.AppImage")
+            mv "$appimage" ./upload/
 
-            for appimage in ./upload/*.AppImage; do
-              temp_dir=$(mktemp -d)
-              7z x "$appimage" -o"$temp_dir"
-              tar -czvf "${appimage%.AppImage}.tar.gz" -C "$temp_dir" .
-              rm -rf "$temp_dir"
-            done
+            temp_dir=$(mktemp -d)
+            7z x "./upload/$(basename "$appimage")" -o"$temp_dir"
+
+            mv ./backend/dist/linux/* "$temp_dir/resources/"
+            tar -czvf "./upload/$(basename "${appimage%.AppImage}.tar.gz")" -C "$temp_dir" .
+
+            rm -rf "$temp_dir"
+            rm ./upload/*.AppImage
           fi
         working-directory: .
 

@@ -42,7 +42,7 @@ function startDjangoServer() {
     )
   } else if (process.platform === 'linux') {
     djangoExecutePath = path.join(
-      isDev ? path.join(__dirname, '../backend/dist/linux/') : path.dirname(process.argv[0]),
+      isDev ? path.join(__dirname, '../backend/dist/linux/') : path.join(path.dirname(process.argv[0]), 'resources/'),
       'DjangoRestfulAPI'
     )
   } else {
