@@ -2,7 +2,6 @@ name: Test Electron Build
 
 on:
   workflow_dispatch:
-
   push:
     branches:
       - test-ci
@@ -17,11 +16,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - platform: win
-            os: windows-latest
+          # - platform: win
+          #   os: windows-latest
 
-          # - platform: linux
-          #   os: ubuntu-latest
+          - platform: linux
+            os: ubuntu-latest
 
           # - platform: mac
           #   os: macos-11
@@ -88,4 +87,4 @@ jobs:
           path: |
             ./frontend/build/*.exe
             ./frontend/build/*.zip
-            ./backend/dist/*.exe
+            ./backend/dist/**/*
