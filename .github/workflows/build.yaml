@@ -5,9 +5,6 @@ on:
   push:
     branches:
       - test-ci
-  pull_request:
-    branches:
-      - test-ci
 
 jobs:
   build:
@@ -63,6 +60,26 @@ jobs:
           python pyi_auto_pack_ci.py ${{ matrix.platform }}
         working-directory: ./backend
 
+      - name: Modify package.json for platform-specific resources
+      run: |
+        if [ "${{ matrix.platform }}" == "win" ]; then
+          BACKEND_PATH="../backend/dist/windows/*"
+        elif [ "${{ matrix.platform }}" == "linux" ]; then
+          BACKEND_PATH="../backend/dist/linux/*"
+        elif [ "${{ matrix.platform }}" == "mac" ]; then
+          BACKEND_PATH="../backend/dist/mac/*"
+        fi
+
+        node -e "
+        const fs = require('fs');
+        const packageJson = JSON.parse(fs.readFileSync('./frontend/package.json', 'utf8'));
+        packageJson.build.extraResources = [
+          { from: BACKEND_PATH, to: 'APIDataDir' },
+          { from: '../config/', to: 'config', filter: ['*.yaml'] }
+        ];
+        fs.writeFileSync('./frontend/package.json', JSON.stringify(packageJson, null, 2));
+        "
+
       - name: Build Electron app for ${{ matrix.platform }}
         shell: bash      
         run: |
@@ -87,4 +104,4 @@ jobs:
           path: |
             ./frontend/build/*.exe
             ./frontend/build/*.zip
-            ./backend/dist/**/*
+            ./backend/dist/
