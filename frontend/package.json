@@ -5,7 +5,8 @@
   "type": "module",
   "main": "main.mjs",
   "description": "GuestLiang's frontend project, build with electron.",
-  "author": "GuestLiang",
+  "homepage": "https://github.com/Guest-Liang",
+  "author": "GuestLiang <GuestLiang@outlook.com>",
   "license": "MIT",
   "scripts": {
     "dev": "vite",
@@ -92,8 +93,7 @@
     },
     "linux": {
       "target": [
-        "AppImage",
-        "deb"
+        "AppImage"
       ],
       "category": "Utility"
     }
