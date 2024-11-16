@@ -1,30 +1,23 @@
-import smtplib, yaml, os, logging, urllib.parse
+import smtplib, os, logging, urllib.parse
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 from django.conf import settings
+from Configs import CONFIG
 
 logger = logging.getLogger(__name__)
 
-if __name__ == "__main__":
-    with open("../config/config.yaml", "r") as file:
-        CONFIG_YAML = yaml.safe_load(file)
-else: 
-    with open(os.path.join(settings.BASE_DIR, "./config/config.yaml"), "r") as file:
-        CONFIG_YAML = yaml.safe_load(file)
-
-
 def SendEmailWithAttachment(
     receiver_email,
-    sender_email = CONFIG_YAML["Email"]["Account"],
+    sender_email = CONFIG["Email"]["Account"],
     subject = "Email From Django Restful API backend",
-    body = """
+    body = f"""
     Do not reply to this email.
     If you received this email by mistake, it may be because our users have entered the wrong email address, please ignore it.
-    --- From Python 3.12.7
+    --- From {CONFIG["API"]["AppName"]} {CONFIG["API"]["Version"]}
     """,
-    password=CONFIG_YAML["Email"]["Password"],
+    password=CONFIG["Email"]["Password"],
     file_paths=None,
     smtp_server="smtp.qq.com",
     smtp_port=587,
@@ -68,22 +61,16 @@ def SendEmailWithAttachment(
 
 
 if __name__ == "__main__":
-    From = CONFIG_YAML["Email"]["Account"]
+    From = CONFIG["Email"]["Account"]
     To = "1736331027@qq.com"
     Subject = "Email From Django Restful API backend"
-    Body = """
-    Do not reply to this email.
-    If you received this email by mistake, it may be because our users have entered the wrong email address, please ignore it.
-    --- From Python 3.12.7
-    """
-    Password = CONFIG_YAML["Email"]["Password"]
+    Password = CONFIG["Email"]["Password"]
     FilePaths = ["./backend/pic/3.png", "./backend/pic/4.png"]
 
     SendEmailWithAttachment(
         sender_email=From, 
         receiver_email=To, 
-        subject=Subject, 
-        body=Body, 
+        subject=Subject,  
         password=Password, 
         file_paths=FilePaths
     )

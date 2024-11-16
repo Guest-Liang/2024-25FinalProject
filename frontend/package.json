@@ -67,13 +67,6 @@
       {
         "from": "../backend/dist/windows",
         "to": "APIDataDir"
-      },
-      {
-        "from": "../config/",
-        "to": "APIDataDir/config",
-        "filter": [
-          "*.yaml"
-        ]
       }
     ],
     "directories": {

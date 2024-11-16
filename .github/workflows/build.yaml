@@ -72,14 +72,11 @@ jobs:
           const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
           if (backendPath === '../backend/dist/linux/') {
-            packageJson.build.extraResources = [
-              { from: '../config/', to: 'config', filter: ['*.yaml'] }
-            ]
+            packageJson.build.extraResources = []
           } else {
             packageJson.build.extraResources = [
               { from: '../backend/dist/pic', to: 'APIDataDir/pic' },
               { from: backendPath, to: 'APIDataDir' },
-              { from: '../config/', to: 'APIDataDir/config', filter: ['*.yaml'] }
             ]
           }
           fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))

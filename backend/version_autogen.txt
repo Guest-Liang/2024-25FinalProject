@@ -1,8 +1,8 @@
 
 VSVersionInfo(
     ffi=FixedFileInfo(
-        filevers=(0, 1, 1, 0),
-        prodvers=(0, 1, 1, 0),
+        filevers=(0, 1, 2, 0),
+        prodvers=(0, 1, 2, 0),
         mask=0x3f,
         flags=0x0,
         OS=0x4,
@@ -17,13 +17,13 @@ VSVersionInfo(
                     '040904B0', 
                     [
                         StringStruct('CompanyName', 'Guest Liang'),
-                        StringStruct('FileDescription', 'DjangoRestfulAPI v0.1.1'),
-                        StringStruct('FileVersion', 'v0.1.1'),
+                        StringStruct('FileDescription', 'DjangoRestfulAPI v0.1.2'),
+                        StringStruct('FileVersion', 'v0.1.2'),
                         StringStruct('InternalName', 'DjangoRestfulAPI'),
                         StringStruct('LegalCopyright', '2024 © Guest Liang'),
                         StringStruct('OriginalFilename', 'DjangoRestfulAPI.exe'),
                         StringStruct('ProductName', 'GuestLiang Django Restful API'),
-                        StringStruct('ProductVersion', 'v0.1.1')
+                        StringStruct('ProductVersion', 'v0.1.2')
                     ]
                 )
             ]
