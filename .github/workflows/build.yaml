@@ -1,13 +1,20 @@
-name: Test Electron Build
+name: Electron Build
 
 on:
   workflow_dispatch:
+    inputs:
+      custom_name:
+        description: 'Workflow run name'
+        required: false
+        default: 'Electron Build'
+
   push:
     branches:
       - test-ci
 
 jobs:
   build:
+    name: ${{ github.event.inputs.custom_name || 'Electron Build' }} - ${{ github.run_id }} 
     runs-on: ${{ matrix.os }}  # use matrix.os to specify different running environment
 
     strategy:
