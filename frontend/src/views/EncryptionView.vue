@@ -165,13 +165,6 @@ const beforeUpload = (file: File) => {
 }
 
 const uploadFiles = async () => {
-  const loading = ElLoading.service({
-    target: '.upload-container',
-    lock: true,
-    text: 'Fetching Data',
-    background: 'rgba(0, 0, 0, 0.6)',
-  })
-
   if (encryptFileList.value.length === 0) {
     ElMessage({
       showClose: true,
@@ -179,7 +172,6 @@ const uploadFiles = async () => {
       type: 'warning',
       duration: 5000,
     })
-    loading.close()
     return
   }
 
@@ -190,9 +182,15 @@ const uploadFiles = async () => {
       type: 'error',
       duration: 5000,
     })
-    loading.close()
     return
   }
+
+  const loading = ElLoading.service({
+    target: '.upload-container',
+    lock: true,
+    text: 'Fetching Data',
+    background: 'rgba(0, 0, 0, 0.6)',
+  })
 
   let RawEncryptFileList = toRaw(encryptFileList.value)
   let RawCustomImageList = toRaw(customImageList.value)
@@ -221,7 +219,7 @@ const uploadFiles = async () => {
 
     if (response.ok) {
       downloadLinks.value = data.results.map((item: EncryptResult, index: number) => {
-        const fileName = item.EncodedImagePath.split('\\').pop()
+        const fileName = item.EncodedImagePath.split(/[/\\]/).pop()
         const originalFile = encryptFileList.value[index]
         return {
           name: fileName,
