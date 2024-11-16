@@ -42,9 +42,12 @@ function startDjangoServer() {
     )
   } else if (process.platform === 'linux') {
     djangoExecutePath = path.join(
-      isDev ? path.join(__dirname, '../backend/dist/linux/') : path.join(path.dirname(process.argv[0]), 'resources/'),
+      isDev
+        ? path.normalize(path.join('/', __dirname, '../backend/dist/linux/'))
+        : path.normalize(path.join(path.dirname(process.argv[0]), 'resources/')),
       'DjangoRestfulAPI'
     )
+    djangoExecutePath = decodeURIComponent(djangoExecutePath)
   } else {
     console.log('Unsupported platform.')
     exit(1)
@@ -53,7 +56,7 @@ function startDjangoServer() {
   console.log(`[startDjangoServer] Django Execute Path: ${djangoExecutePath}`)
 
   if (!fs.existsSync(djangoExecutePath)) {
-    console.error('No Django backend exe file found.')
+    console.error('No Django backend file found.')
     if (win) {
       win.webContents.send('django-status', { message: 'Django Restful API backend not found, application will close in 10 seconds!' })
     }
