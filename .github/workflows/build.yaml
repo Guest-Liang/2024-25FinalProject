@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    name: ${{ github.event.inputs.custom_name || 'Electron Build' }} - ${{ github.run_id }} 
+    name: ${{ github.event.inputs.custom_name || 'Electron Build' }} - ${{ github.run_id }} - ${{ matrix.platform }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}  # use matrix.os to specify different running environment
 
     strategy:
