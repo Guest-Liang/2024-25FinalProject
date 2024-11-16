@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}  # 使用 matrix 中的 os 配置来指定不同的运行环境
+    runs-on: ${{ matrix.os }}  # use matrix.os to specify different running environment
 
     strategy:
       matrix:
@@ -32,13 +32,13 @@ jobs:
         run: |
           npm install -g pnpm
 
-      - name: Install frontend dependencies and build # vue 构建
+      - name: Install frontend dependencies and build # vue build
         run: |
           pnpm install
           pnpm run build-only
         working-directory: ./frontend
 
-      - name: Set up Python environment  # 设置 Python 环境
+      - name: Set up Python environment
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
