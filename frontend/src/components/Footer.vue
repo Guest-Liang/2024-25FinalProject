@@ -3,7 +3,7 @@
 <template>
   <div class="footer-content">
     <p>&copy; 2024 GuestLiang</p>
-    <a href="https://github.com/Guest-Liang">GitHub Link</a>
+    <el-text class="mx-1" type="success">https://github.com/Guest-Liang</el-text>
   </div>
 </template>
 

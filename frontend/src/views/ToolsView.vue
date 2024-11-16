@@ -149,7 +149,8 @@ const beforeUpload = (file: File) => {
 }
 
 .hash-table-container {
-  max-height: 50%;
+  max-height: 100%;
+  height: calc(100vh - 310px);
   width: 100%;
   min-width: 200px;
   padding-top: 10px;
@@ -158,7 +159,7 @@ const beforeUpload = (file: File) => {
 .el-table {
   margin-top: 10px;
   margin: 0;
-  height: 50vh;
+  height: 100%;
   width: 100%;
 }
 
@@ -171,6 +172,14 @@ const beforeUpload = (file: File) => {
   align-items: center;
   border: 2px dashed #409eff;
   border-radius: 10px;
+}
+
+.el-upload-dragger .el-upload__text {
+  font-size: 1.4rem;
+}
+
+.el-upload__tip {
+  font-size: 1rem;
 }
 
 .el-button + .el-button {

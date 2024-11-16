@@ -156,7 +156,7 @@ const uploadFiles = async () => {
     if (response.ok) {
       const data = await response.json()
       downloadLinks.value = data.results.map((item: DecryptResult) => {
-        const fileName = item.DecryptedFilePath.split('\\').pop()
+        const fileName = item.DecryptedFilePath.split(/[/\\]/).pop()
         return {
           name: fileName,
           url: `http://${BACKEND_API}/api/download/${fileName}`,
@@ -214,6 +214,14 @@ const uploadFiles = async () => {
   align-items: center;
   border: 2px dashed #409eff;
   border-radius: 10px;
+}
+
+.el-upload-dragger .el-upload__text {
+  font-size: 1.4rem;
+}
+
+.el-upload__tip {
+  font-size: 1rem;
 }
 
 .el-button + .el-button {

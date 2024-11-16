@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu } from 'electron'
+import { app, BrowserWindow, Menu, dialog } from 'electron'
 import path from 'path'
 import { exec, spawn } from 'child_process'
 import iconv from 'iconv-lite'
@@ -100,6 +100,7 @@ function createWindow() {
     minHeight: 300,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      devTools: isDev,
       nodeIntegration: false,
       contextIsolation: true,
       webSecurity: false,
@@ -111,7 +112,7 @@ function createWindow() {
     win.loadURL('http://localhost:5173') // dev, hot reload
     console.log('[createWindow] Load dev server localhost:5173')
   } else {
-    win.loadFile('./dist/index.html') // prod
+    win.loadFile('./dist/index.html') // production
     console.log('[createWindow] Load prod file ./dist/index.html')
   }
 
@@ -122,8 +123,22 @@ function createWindow() {
     {
       label: 'File',
       submenu: [
-        { label: 'Open', click: () => console.log('Open clicked') },
-        { label: 'Save', click: () => console.log('Save clicked') },
+        {
+          label: 'Clear Cache',
+          click: () => {
+            const win = BrowserWindow.getFocusedWindow()
+            if (win) {
+              win.webContents.session.clearCache().then(() => {
+                dialog.showMessageBox({
+                  type: 'info',
+                  title: 'Cache Cleared',
+                  message: 'Cache cleared successfully!',
+                  buttons: ['OK']
+                })
+              })
+            }
+          },
+        },
         { type: 'separator' },
         { label: 'Exit', role: 'quit' }
       ]
@@ -131,34 +146,52 @@ function createWindow() {
     {
       label: 'Edit',
       submenu: [
-        { label: 'Undo', role: 'undo' },
-        { label: 'Redo', role: 'redo' },
-        { type: 'separator' },
         { label: 'Cut', role: 'cut' },
         { label: 'Copy', role: 'copy' },
-        { label: 'Paste', role: 'paste' }
+        { label: 'Paste', role: 'paste' },
       ]
     },
     {
       label: 'View',
       submenu: [
-        { label: 'Reload', accelerator: 'Ctrl+R', click: () => win.reload() },
-        { label: 'Toggle Developer Tools', accelerator: 'Ctrl+Shift+I', click: () => win.webContents.toggleDevTools() },
-        { label: 'Actual Size', accelerator: 'Ctrl+0', role: 'resetzoom' },
-        { label: 'Zoom In', accelerator: 'Ctrl+Plus', role: 'zoomin' },
-        { label: 'Zoom Out', accelerator: 'Ctrl+-', role: 'zoomout' }
+        { label: 'Refresh', accelerator: 'F5', click: () => win.reload() },
       ]
     },
     {
       label: 'Help',
       submenu: [
-        { label: 'Learn More', click: () => console.log('Learn More clicked') }
+        {
+          label: 'About',
+          click: () => {
+            dialog.showMessageBox({
+              type: 'info',
+              title: 'About',
+              message: 'This app was developed by Guest Liang.',
+              detail: 'For more information, visit https://github.com/Guest-Liang.',
+              buttons: ['OK']
+            })
+          },
+        }
       ]
     }
   ]
 
   const menu = Menu.buildFromTemplate(menuTemplate)
   Menu.setApplicationMenu(menu)
+
+  win.webContents.on('context-menu', (event, params) => {
+    const contextMenu = Menu.buildFromTemplate([
+      { label: 'Reload', click: () => win.reload() },
+      { label: 'Copy', role: 'copy', enabled: params.editFlags.canCopy },
+      { label: 'Paste', role: 'paste', enabled: params.editFlags.canPaste },
+      { type: 'separator' },
+      { label: 'Custom Action', click: () => {
+          console.log('Custom action triggered!')
+        }
+      }
+    ])
+    contextMenu.popup(win)
+  })
 
   win.on('closed', () => {
     win = null

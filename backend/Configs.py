@@ -11,5 +11,9 @@ CONFIG = {
         "CompanyName": "Guest Liang",
         "LegalCopyright": "2024 © Guest Liang",
         "ProductName": "GuestLiang Django Restful API"
+    },
+    "Electron": { # Same as package.json
+        "Name": "guestliang-electron-app",
+        "Version": "0.2.2"
     }
 }

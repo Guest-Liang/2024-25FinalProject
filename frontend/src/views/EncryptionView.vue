@@ -250,7 +250,7 @@ const uploadFiles = async () => {
 }
 </script>
 
-<style>
+<style scoped>
 .encryption {
   display: flex;
   flex-direction: column;

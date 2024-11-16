@@ -12,7 +12,6 @@ import Intro from '../components/Intro.vue'
 main {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   padding-left: calc(35vw - 230px);
   height: 100%;
 }

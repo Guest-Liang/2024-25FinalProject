@@ -16,7 +16,6 @@ defineProps<{
   align-items: center;
   justify-content: center;
   width: 100%;
-  line-height: 100px;
   font-size: 2.5rem;
   font-family: '思源黑体 Medium', sans-serif;
   color: #333;
