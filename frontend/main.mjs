@@ -57,12 +57,6 @@ function startDjangoServer() {
 
   if (!fs.existsSync(djangoExecutePath)) {
     console.error('No Django backend file found.')
-    if (win) {
-      win.webContents.send('django-status', { message: 'Django Restful API backend not found, application will close in 10 seconds!' })
-    }
-    setTimeout(() => {
-      app.quit()
-    }, 10000)
     return
   }
 
@@ -70,34 +64,16 @@ function startDjangoServer() {
 
   if (!djangoProcess) {
     console.error('Failed to spawn Django process.')
-    if (win) {
-      win.webContents.send('django-status', { message: 'Django Restful API backend fail to spawn, application will close in 10 seconds!' })
-    }
-    setTimeout(() => {
-      app.quit()
-    }, 10000)
     return
   }
 
   djangoProcess.on('error', (err) => {
     console.error(`[Django server error] ${err}`)
-    if (win) {
-      win.webContents.send('django-status', { message: 'Django Restful API backend error, application will close in 10 seconds!' })
-    }
-    setTimeout(() => {
-      app.quit()
-    }, 10000)
   })
 
   djangoProcess.on('exit', (code) => {
     if (code !== 0) {
       console.error(`Django backend process exited with error code ${code}`)
-      if (win) {
-        win.webContents.send('django-status', { message: `Django backend exit, error code: ${code}\napplication will close in 10 seconds!` })
-      }
-      setTimeout(() => {
-        app.quit()
-      }, 10000)
     } else {
       console.log('Django backend started successfully.')
     }
@@ -199,7 +175,7 @@ app.whenReady().then(() => {
         console.log('[win.onclose] Django backend process killed.')
       }
       killDjangoProcess()
-      console.log('[win.onclose] Django exe process killed.')
+      console.log('[win.onclose] Django process killed.')
     }
   })
 
@@ -218,7 +194,7 @@ app.whenReady().then(() => {
       console.log('[before-quit] Django backend process killed.')
     }
     killDjangoProcess()
-    console.log('[before-quit] Django exe process killed.')
+    console.log('[before-quit] Django process killed.')
   })
 
   app.on('activate', () => {
