@@ -5,7 +5,7 @@ CONFIG = {
         "Password": "fevsouzjombtbdgi"
     },
     "API": {
-        "Version": "v0.1.2",
+        "Version": "v0.1.3",
         "AppName": "DjangoRestfulAPI",
         "FileName": "DjangoRestfulAPI",
         "CompanyName": "Guest Liang",
@@ -14,6 +14,6 @@ CONFIG = {
     },
     "Electron": { # Same as package.json
         "Name": "guestliang-electron-app",
-        "Version": "0.2.2"
+        "Version": "0.2.3"
     }
 }

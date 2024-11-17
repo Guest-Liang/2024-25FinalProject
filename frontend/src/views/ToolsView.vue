@@ -150,7 +150,7 @@ const beforeUpload = (file: File) => {
 
 .hash-table-container {
   max-height: 100%;
-  height: calc(100vh - 310px);
+  height: calc(100vh - 330px);
   width: 100%;
   min-width: 200px;
   padding-top: 10px;

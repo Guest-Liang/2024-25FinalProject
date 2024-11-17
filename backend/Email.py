@@ -1,4 +1,4 @@
-import smtplib, os, logging, urllib.parse
+import smtplib, os, logging, urllib.parse, platform
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -15,7 +15,7 @@ def SendEmailWithAttachment(
     body = f"""
     Do not reply to this email.
     If you received this email by mistake, it may be because our users have entered the wrong email address, please ignore it.
-    --- From {CONFIG['Electron']['Name']} {CONFIG['Electron']["Version"]} {CONFIG["API"]["AppName"]} {CONFIG["API"]["Version"]}
+    --- From {platform.system()} {CONFIG['Electron']['Name']}-{CONFIG['Electron']["Version"]} {CONFIG["API"]["AppName"]}-{CONFIG["API"]["Version"]}
     """,
     password=CONFIG["Email"]["Password"],
     file_paths=None,
