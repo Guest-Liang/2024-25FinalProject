@@ -5,7 +5,7 @@ class Config:
         Password = "fevsouzjombtbdgi"
 
     class API:
-        Version = "v0.1.3"
+        Version = "v0.1.4"
         AppName = "DjangoRestfulAPI"
         FileName = "DjangoRestfulAPI"
         CompanyName = "Guest Liang"
@@ -14,6 +14,6 @@ class Config:
 
     class Electron:
         Name = "guestliang-electron-app"
-        Version = "0.2.3"
+        Version = "0.2.3" # Same as package.json
 
 config = Config()

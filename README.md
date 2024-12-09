@@ -10,7 +10,7 @@ backend， 产物在dist，开发环境python=3.12.7:
 cd backend
 conda activate FinalProject
 pip install -r requirements.txt
-python pyi_auto_pack.py
+python pyi_auto_pack_ci.py win (or linux)
 ```
 
 vue前端, 产物在dist:   
@@ -23,7 +23,7 @@ pnpm build-only
 electron, 产物在build:   
 ```npm
 cd frontend
-pnpm electron-builder --win
+pnpm electron-builder --win (or --linux)
 ```
 
 # 运行
