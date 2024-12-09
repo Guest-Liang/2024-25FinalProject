@@ -4,20 +4,21 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 from django.conf import settings
-from Configs import CONFIG
+import Configs
+CONFIG = Configs.Config()
 
 logger = logging.getLogger(__name__)
 
 def SendEmailWithAttachment(
     receiver_email,
-    sender_email = CONFIG["Email"]["Account"],
+    sender_email = CONFIG.Email.Account,
     subject = "Email From Django Restful API backend",
     body = f"""
     Do not reply to this email.
     If you received this email by mistake, it may be because our users have entered the wrong email address, please ignore it.
-    --- From {platform.system()} {CONFIG['Electron']['Name']}-{CONFIG['Electron']["Version"]} {CONFIG["API"]["AppName"]}-{CONFIG["API"]["Version"]}
+    --- From {platform.system()} {CONFIG.Electron.Name}-{CONFIG.Electron.Version} {CONFIG.API.AppName}-{CONFIG.API.Version}
     """,
-    password=CONFIG["Email"]["Password"],
+    password=CONFIG.Email.Password,
     file_paths=None,
     smtp_server="smtp.qq.com",
     smtp_port=587,
@@ -61,10 +62,10 @@ def SendEmailWithAttachment(
 
 
 if __name__ == "__main__":
-    From = CONFIG["Email"]["Account"]
+    From = CONFIG.Email.Account
     To = "1736331027@qq.com"
     Subject = "Email From Django Restful API backend"
-    Password = CONFIG["Email"]["Password"]
+    Password = CONFIG.Email.Password
     FilePaths = ["./backend/pic/3.png", "./backend/pic/4.png"]
 
     SendEmailWithAttachment(

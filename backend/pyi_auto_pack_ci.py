@@ -1,6 +1,7 @@
 import PyInstaller.__main__
 import re, datetime, time, os, sys
-from Configs import CONFIG
+import Configs
+CONFIG = Configs.Config()
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_project.settings'
 from django.conf import settings
@@ -16,7 +17,7 @@ isGithubActions = os.environ.get('CI', 'false') == 'true'
 VersionFileName = "version_autogen.txt"
 
 # Parse version number
-match = re.match(r"v(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?", CONFIG['API']['Version'])
+match = re.match(r"v(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?", CONFIG.API.Version)
 if match:
     major, minor, patch, build = match.groups()
     build = build if build is not None else "0"
@@ -42,14 +43,14 @@ VSVersionInfo(
                 StringTable(
                     '040904B0', 
                     [
-                        StringStruct('CompanyName', '{CONFIG['API']['CompanyName']}'),
-                        StringStruct('FileDescription', '{CONFIG['API']['AppName']} {CONFIG['API']['Version']}'),
-                        StringStruct('FileVersion', '{CONFIG['API']['Version']}'),
-                        StringStruct('InternalName', '{CONFIG['API']['AppName']}'),
-                        StringStruct('LegalCopyright', '{CONFIG['API']['LegalCopyright']}'),
-                        StringStruct('OriginalFilename', '{CONFIG['API']['AppName']}.exe'),
-                        StringStruct('ProductName', '{CONFIG['API']['ProductName']}'),
-                        StringStruct('ProductVersion', '{CONFIG['API']['Version']}')
+                        StringStruct('CompanyName', '{CONFIG.API.CompanyName}'),
+                        StringStruct('FileDescription', '{CONFIG.API.AppName} {CONFIG.API.Version}'),
+                        StringStruct('FileVersion', '{CONFIG.API.Version}'),
+                        StringStruct('InternalName', '{CONFIG.API.AppName}'),
+                        StringStruct('LegalCopyright', '{CONFIG.API.LegalCopyright}'),
+                        StringStruct('OriginalFilename', '{CONFIG.API.AppName}.exe'),
+                        StringStruct('ProductName', '{CONFIG.API.ProductName}'),
+                        StringStruct('ProductVersion', '{CONFIG.API.Version}')
                     ]
                 )
             ]
@@ -72,7 +73,7 @@ print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Version file c
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Waiting for 1 seconds...')
 time.sleep(1)
 
-print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] The version for this build is: {CONFIG['API']['Version']}')
+print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] The version for this build is: {CONFIG.API.Version}')
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] Running PyInstaller...')
 
 # Define platform-specific configurations in a dictionary
@@ -89,7 +90,7 @@ if PlatformArg in Platforms:
     # Build arguments for PyInstaller
     args = [
         'manage.py',
-        f'--name={CONFIG['API']['FileName']}',
+        f'--name={CONFIG.API.FileName}',
         '--onefile',            # Single executable file
         '--console',            # Console output
         '--noconfirm',          # Automatic confirmation, ignore all prompts
@@ -118,6 +119,6 @@ else:
 
 # Clean up spec file
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] PyInstaller finished, cleaning spec file...')
-os.remove(f"{CONFIG['API']['FileName']}.spec")
+os.remove(f"{CONFIG.API.FileName}.spec")
 
 print(f'[{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] All done, exiting...')
