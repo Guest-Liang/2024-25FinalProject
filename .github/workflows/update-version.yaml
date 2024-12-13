@@ -3,8 +3,7 @@ name: Update Version Based on Commits
 on:
   push:
     branches:
-      - testci # 在testci分支上由push触发
-  workflow_dispatch:
+      - tectci
 
 permissions:
   contents: write
@@ -136,5 +135,5 @@ jobs:
 
           git add .
           git commit -m "$COMMIT_MSG"
-          git push origin testci
+            git push origin testci
         fi
