@@ -64,29 +64,29 @@ jobs:
 
     - name: Print determined version
       run: |
-        echo "API Version Type: ${{ process.env.api_version_type }}"
-        echo "Electron Version Type: ${{ process.env.ele_version_type }}"
+        echo "API Version Type: ${{ env.api_version_type }}"
+        echo "Electron Version Type: ${{ env.ele_version_type }}"
 
 
     - name: Bump versions using Python
       run: |
         # 同时检查API和Electron两个类型，如果有就执行对应升级
-        if [ -n "${{ process.env.api_version_type }}" ]; then
-          if [ "${{ process.env.api_version_type }}" = "major" ]; then
+        if [ -n "${{ env.api_version_type }}" ]; then
+          if [ "${{ env.api_version_type }}" = "major" ]; then
             python backend/Configs.py --api-major
-          elif [ "${{ process.env.api_version_type }}" = "minor" ]; then
+          elif [ "${{ env.api_version_type }}" = "minor" ]; then
             python backend/Configs.py --api-minor
-          elif [ "${{ process.env.api_version_type }}" = "patch" ]; then
+          elif [ "${{ env.api_version_type }}" = "patch" ]; then
             python backend/Configs.py --api-patch
           fi
         fi
 
-        if [ -n "${{ process.env.ele_version_type }}" ]; then
-          if [ "${{ process.env.ele_version_type }}" = "major" ]; then
+        if [ -n "${{ env.ele_version_type }}" ]; then
+          if [ "${{ env.ele_version_type }}" = "major" ]; then
             python backend/Configs.py --electron-major
-          elif [ "${{ process.env.ele_version_type }}" = "minor" ]; then
+          elif [ "${{ env.ele_version_type }}" = "minor" ]; then
             python backend/Configs.py --electron-minor
-          elif [ "${{ process.env.ele_version_type }}" = "patch" ]; then
+          elif [ "${{ env.ele_version_type }}" = "patch" ]; then
             python backend/Configs.py --electron-patch
           fi
 
@@ -96,7 +96,7 @@ jobs:
 
     - name: Commit and push changes
       run: |
-        if [ -z "${{ process.env.api_version_type }}" ] && [ -z "${{ process.env.ele_version_type }}" ]; then
+        if [ -z "${{ env.api_version_type }}" ] && [ -z "${{ env.ele_version_type }}" ]; then
           echo "No version updates needed, skipping commit and push."
         else
           git add .
