@@ -171,52 +171,63 @@ jobs:
     - name: Find Linux file
       id: find_linux
       run: |
-        # 找出 final 目录下的 *.tar.gz 文件
         FILE=$(ls build/*.tar.gz | head -n 1)
+        BASENAME=$(basename "$FILE")
         echo "LINUX_FILE=$FILE" >> $GITHUB_ENV
+        echo "LINUX_BASENAME=$BASENAME" >> $GITHUB_ENV
         export LINUX_FILE
+        export LINUX_BASENAME
 
     - name: Upload Linux Release Asset
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ${{ env.LINUX_FILE }}
-        asset_name: linux_file
+        asset_name: ${{ env.LINUX_BASENAME }}
         asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
     - name: Find Windows exe file
       id: find_windows_exe
       run: |
         EXE_FILE=$(ls build/*.exe | head -n 1)
+        EXE_BASENAME=$(basename "$EXE_FILE")
         echo "WIN_EXE_FILE=$EXE_FILE" >> $GITHUB_ENV
+        echo "WIN_EXE_BASENAME=$EXE_BASENAME" >> $GITHUB_ENV
         export WIN_EXE_FILE
+        export WIN_EXE_BASENAME
 
     - name: Upload Windows Release Asset #1
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ${{ env.WIN_EXE_FILE }}
-        asset_name: windows_file_exe
+        asset_name: ${{ env.WIN_EXE_BASENAME }}
         asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
     - name: Find Windows zip file
       id: find_windows_zip
       run: |
         ZIP_FILE=$(ls build/*.zip | head -n 1)
+        ZIP_BASENAME=$(basename "$ZIP_FILE")
         echo "WIN_ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
+        echo "WIN_ZIP_BASENAME=$ZIP_BASENAME" >> $GITHUB_ENV
         export WIN_ZIP_FILE
+        export WIN_ZIP_BASENAME
 
     - name: Upload Windows Release Asset #2
       uses: actions/upload-release-asset@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ${{ env.WIN_ZIP_FILE }}
-        asset_name: windows_file_zip
+        asset_name: ${{ env.WIN_ZIP_BASENAME }}
         asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

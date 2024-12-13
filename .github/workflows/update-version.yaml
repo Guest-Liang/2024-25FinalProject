@@ -3,7 +3,7 @@ name: Update Version Based on Commits
 on:
   push:
     branches:
-      - testci
+      - main
 
 permissions:
   contents: write
@@ -135,5 +135,5 @@ jobs:
 
           git add .
           git commit -m "$COMMIT_MSG"
-            git push origin testci
+            git push origin main
         fi
