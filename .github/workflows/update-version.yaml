@@ -3,7 +3,7 @@ name: Update Version Based on Commits
 on:
   push:
     branches:
-      - tectci
+      - testci
 
 permissions:
   contents: write
