@@ -34,11 +34,14 @@ jobs:
 
     - name: Determine version based on commit message
       id: determine_version
+      shell: bash
       run: |
         LAST_COMMIT=$(git log -1 --pretty=%B)
         echo "Last commit: $LAST_COMMIT"
         echo "api_version_type=" >> $GITHUB_ENV
         echo "ele_version_type=" >> $GITHUB_ENV
+        export api_version_type
+        export ele_version_type
 
         if echo "$LAST_COMMIT" | grep -q "apibreaking"; then
           echo "api_version_type=major" >> $GITHUB_ENV
@@ -55,32 +58,35 @@ jobs:
         elif echo "$LAST_COMMIT" | grep -q "elefix"; then
           echo "ele_version_type=patch" >> $GITHUB_ENV
         fi
+      env: 
+        api_version_type: ${{ env.api_version_type }}
+        ele_version_type: ${{ env.ele_version_type }}
 
     - name: Print determined version
       run: |
-        echo "API Version Type: ${{ env.api_version_type }}"
-        echo "Electron Version Type: ${{ env.ele_version_type }}"
+        echo "API Version Type: ${{ process.env.api_version_type }}"
+        echo "Electron Version Type: ${{ process.env.ele_version_type }}"
 
 
     - name: Bump versions using Python
       run: |
         # 同时检查API和Electron两个类型，如果有就执行对应升级
-        if [ -n "${{ env.api_version_type }}" ]; then
-          if [ "${{ env.api_version_type }}" = "major" ]; then
+        if [ -n "${{ process.env.api_version_type }}" ]; then
+          if [ "${{ process.env.api_version_type }}" = "major" ]; then
             python backend/Configs.py --api-major
-          elif [ "${{ env.api_version_type }}" = "minor" ]; then
+          elif [ "${{ process.env.api_version_type }}" = "minor" ]; then
             python backend/Configs.py --api-minor
-          elif [ "${{ env.api_version_type }}" = "patch" ]; then
+          elif [ "${{ process.env.api_version_type }}" = "patch" ]; then
             python backend/Configs.py --api-patch
           fi
         fi
 
-        if [ -n "${{ env.ele_version_type }}" ]; then
-          if [ "${{ env.ele_version_type }}" = "major" ]; then
+        if [ -n "${{ process.env.ele_version_type }}" ]; then
+          if [ "${{ process.env.ele_version_type }}" = "major" ]; then
             python backend/Configs.py --electron-major
-          elif [ "${{ env.ele_version_type }}" = "minor" ]; then
+          elif [ "${{ process.env.ele_version_type }}" = "minor" ]; then
             python backend/Configs.py --electron-minor
-          elif [ "${{ env.ele_version_type }}" = "patch" ]; then
+          elif [ "${{ process.env.ele_version_type }}" = "patch" ]; then
             python backend/Configs.py --electron-patch
           fi
 
@@ -90,7 +96,7 @@ jobs:
 
     - name: Commit and push changes
       run: |
-        if [ -z "${{ env.api_version_type }}" ] && [ -z "${{ env.ele_version_type }}" ]; then
+        if [ -z "${{ process.env.api_version_type }}" ] && [ -z "${{ process.env.ele_version_type }}" ]; then
           echo "No version updates needed, skipping commit and push."
         else
           git add .
