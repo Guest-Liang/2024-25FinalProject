@@ -129,7 +129,7 @@ const uploadFiles = async () => {
     background: 'rgba(0, 0, 0, 0.6)',
   })
 
-  let RawCustomImageList = toRaw(customImageList.value)
+  const RawCustomImageList = toRaw(customImageList.value)
   if (customImageList.value.length === 0) {
     ElMessage({
       showClose: true,

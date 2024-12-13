@@ -2,15 +2,11 @@ name: Electron Build
 
 on:
   workflow_dispatch:
-    inputs:
-      custom_name:
-        description: 'Workflow run name'
-        required: false
-        default: 'Electron Build'
 
-  push:
-    branches:
-      - test-ci
+  workflow_run:
+    workflows: ["Update Version Based on Commits"] # 与update-version.yaml中的name对应
+    types: 
+      - completed
 
 jobs:
   build:
