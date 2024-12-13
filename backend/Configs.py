@@ -48,9 +48,9 @@ def update_api_version(increment_type="patch"):
 
             with open(__file__, "w", encoding="utf-8") as f:
                 f.write(new_content)
+            print(f"API version has updated from {old_version} to {new_version}")
     except Exception as e:
         print(f"Failed to update API version: {e}")
-
 
 def update_electron_version(increment_type="patch"):
     try: 
@@ -80,6 +80,7 @@ def update_electron_version(increment_type="patch"):
 
             with open(__file__, "w", encoding="utf-8") as f:
                 f.write(new_content)
+            print(f"Electron version has updated from {old_version} to {new_version}")
     except Exception as e:
         print(f"Failed to update Electron version: {e}")
 
@@ -93,11 +94,12 @@ def update_frontend_version():
         with open(frontend_package_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
+        old_version = data["version"]
         data["version"] = Config.Electron.Version
 
         with open(frontend_package_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-        print(f"package.json version has updated to {Config.Electron.Version}")
+        print(f"package.json version has updated from {old_version} to {Config.Electron.Version}")
     except Exception as e:
         print(f"Failed to sync package.json version: {e}")
 
