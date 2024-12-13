@@ -63,15 +63,15 @@ jobs:
         ele_version_type: ${{ env.ele_version_type }}
 
     - name: Record old versions
-        id: record_old_versions
-        run: |
-          API_OLD_VERSION=$(grep 'Version\s*=\s*"v' backend/Configs.py | sed -E 's/.*Version\s*=\s*"v([^"]+)".*/\1/')
-          ELE_OLD_VERSION=$(grep 'Version\s*=\s*"[0-9]' backend/Configs.py | sed -E 's/.*Version\s*=\s*"([^"]+)".*/\1/' | tail -n1)
-          export API_OLD_VERSION
-          export ELE_OLD_VERSION
+      id: record_old_versions
+      run: |
+        API_OLD_VERSION=$(grep 'Version\s*=\s*"v' backend/Configs.py | sed -E 's/.*Version\s*=\s*"v([^"]+)".*/\1/')
+        ELE_OLD_VERSION=$(grep 'Version\s*=\s*"[0-9]' backend/Configs.py | sed -E 's/.*Version\s*=\s*"([^"]+)".*/\1/' | tail -n1)
+        export API_OLD_VERSION
+        export ELE_OLD_VERSION
 
-          echo "API_OLD_VERSION=$API_OLD_VERSION" >> $GITHUB_ENV
-          echo "ELE_OLD_VERSION=$ELE_OLD_VERSION" >> $GITHUB_ENV
+        echo "API_OLD_VERSION=$API_OLD_VERSION" >> $GITHUB_ENV
+        echo "ELE_OLD_VERSION=$ELE_OLD_VERSION" >> $GITHUB_ENV
 
     - name: Print version
       run: |
