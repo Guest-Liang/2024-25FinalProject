@@ -3,11 +3,6 @@ name: Electron Build and Release
 on:
   workflow_dispatch:
 
-  workflow_run:
-    workflows: ["Update Version Based on Commits"] # 与update-version.yaml中的name对应
-    types: 
-      - completed
-
 jobs:
   build:
     name: ${{ github.event.inputs.custom_name || 'Electron Build' }} - ${{ matrix.platform }} - ${{ matrix.os }}
@@ -145,12 +140,6 @@ jobs:
         name: electron-build-win-windows-latest
         path: ./build
 
-    - name: Unzip artifacts and combine
-      run: |
-        mkdir -p final
-        # 解压所有 zip 文件到 final 目录
-        find ./build -name "*.zip" -exec unzip {} -d final \;
-
     - name: Retrieve Versions
       id: get_versions
       run: |
@@ -175,18 +164,55 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-
-    - name: Upload all files in final directory
+    - name: Find Linux file
+      id: find_linux
       run: |
-        for file in ./final/*; do
-          echo "Uploading $file..."
-          curl \
-            -X POST \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Content-Type: application/octet-stream" \
-            --data-binary @"$file" \
-            "${{ steps.create_release.outputs.upload_url }}?name=$(basename "$file")"
-        done
+        # 找出 final 目录下的 *.tar.gz 文件
+        FILE=$(ls final/*.tar.gz | head -n 1)
+        echo "LINUX_FILE=$FILE" >> $GITHUB_ENV
+        export LINUX_FILE
+
+    - name: Upload Linux Release Asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.LINUX_FILE }}
+        asset_name: linux_file
+        asset_content_type: application/octet-stream
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
+    - name: Find Windows exe file
+      id: find_windows_exe
+      run: |
+        EXE_FILE=$(ls final/*.exe | head -n 1)
+        echo "WIN_EXE_FILE=$EXE_FILE" >> $GITHUB_ENV
+        export WIN_EXE_FILE
+
+    - name: Upload Windows Release Asset #1
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.WIN_EXE_FILE }}
+        asset_name: windows_file_exe
+        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Find Windows zip file
+      id: find_windows_zip
+      run: |
+        ZIP_FILE=$(ls final/*.zip | head -n 1)
+        echo "WIN_ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
+        export WIN_ZIP_FILE
+
+    - name: Upload Windows Release Asset #2
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.WIN_ZIP_FILE }}
+        asset_name: windows_file_zip
+        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
