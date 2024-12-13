@@ -37,13 +37,9 @@ jobs:
       run: |
         LAST_COMMIT=$(git log -1 --pretty=%B)
         echo "Last commit: $LAST_COMMIT"
-
-        # 初始化为不更新
         echo "api_version_type=" >> $GITHUB_ENV
         echo "ele_version_type=" >> $GITHUB_ENV
 
-        # 根据commit信息为API和Electron分别判定版本类型
-        # API部分
         if echo "$LAST_COMMIT" | grep -q "apibreaking"; then
           echo "api_version_type=major" >> $GITHUB_ENV
         elif echo "$LAST_COMMIT" | grep -q "apifeat"; then
@@ -52,7 +48,6 @@ jobs:
           echo "api_version_type=patch" >> $GITHUB_ENV
         fi
 
-        # Electron部分
         if echo "$LAST_COMMIT" | grep -q "elebreaking"; then
           echo "ele_version_type=major" >> $GITHUB_ENV
         elif echo "$LAST_COMMIT" | grep -q "elefeat"; then
@@ -61,8 +56,11 @@ jobs:
           echo "ele_version_type=patch" >> $GITHUB_ENV
         fi
 
+    - name: Print determined version
+      run: |
         echo "API Version Type: ${{ env.api_version_type }}"
         echo "Electron Version Type: ${{ env.ele_version_type }}"
+
 
     - name: Bump versions using Python
       run: |
