@@ -8,7 +8,7 @@ class Config:
         Password = "fevsouzjombtbdgi"
 
     class API:
-        Version = "v0.1.7"
+        Version = "v0.1.8"
         AppName = "DjangoRestfulAPI"
         FileName = "DjangoRestfulAPI"
         CompanyName = "Guest Liang"
