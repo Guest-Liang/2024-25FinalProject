@@ -1,0 +1,102 @@
+name: Update Version Based on Commits
+
+on:
+  push:
+    branches:
+      - testci # 在testci分支上由push触发
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set git config
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install backend Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      working-directory: ./backend
+
+    - name: Determine version based on commit message
+      id: determine_version
+      run: |
+        LAST_COMMIT=$(git log -1 --pretty=%B)
+        echo "Last commit: $LAST_COMMIT"
+
+        # 初始化为不更新
+        echo "api_version_type=" >> $GITHUB_ENV
+        echo "ele_version_type=" >> $GITHUB_ENV
+
+        # 根据commit信息为API和Electron分别判定版本类型
+        # API部分
+        if echo "$LAST_COMMIT" | grep -q "apibreaking"; then
+          echo "api_version_type=major" >> $GITHUB_ENV
+        elif echo "$LAST_COMMIT" | grep -q "apifeat"; then
+          echo "api_version_type=minor" >> $GITHUB_ENV
+        elif echo "$LAST_COMMIT" | grep -q "apifix"; then
+          echo "api_version_type=patch" >> $GITHUB_ENV
+        fi
+
+        # Electron部分
+        if echo "$LAST_COMMIT" | grep -q "elebreaking"; then
+          echo "ele_version_type=major" >> $GITHUB_ENV
+        elif echo "$LAST_COMMIT" | grep -q "elefeat"; then
+          echo "ele_version_type=minor" >> $GITHUB_ENV
+        elif echo "$LAST_COMMIT" | grep -q "elefix"; then
+          echo "ele_version_type=patch" >> $GITHUB_ENV
+        fi
+
+        echo "API Version Type: ${{ env.api_version_type }}"
+        echo "Electron Version Type: ${{ env.ele_version_type }}"
+
+    - name: Bump versions using Python
+      run: |
+        # 同时检查API和Electron两个类型，如果有就执行对应升级
+        if [ -n "${{ env.api_version_type }}" ]; then
+          if [ "${{ env.api_version_type }}" = "major" ]; then
+            python backend/Configs.py --api-major
+          elif [ "${{ env.api_version_type }}" = "minor" ]; then
+            python backend/Configs.py --api-minor
+          elif [ "${{ env.api_version_type }}" = "patch" ]; then
+            python backend/Configs.py --api-patch
+          fi
+        fi
+
+        if [ -n "${{ env.ele_version_type }}" ]; then
+          if [ "${{ env.ele_version_type }}" = "major" ]; then
+            python backend/Configs.py --electron-major
+          elif [ "${{ env.ele_version_type }}" = "minor" ]; then
+            python backend/Configs.py --electron-minor
+          elif [ "${{ env.ele_version_type }}" = "patch" ]; then
+            python backend/Configs.py --electron-patch
+          fi
+
+          # Electron更新完成后同步前端package.json
+          python backend/Configs.py --sync-packagejson
+        fi
+
+    - name: Commit and push changes
+      run: |
+        if [ -z "${{ env.api_version_type }}" ] && [ -z "${{ env.ele_version_type }}" ]; then
+          echo "No version updates needed, skipping commit and push."
+        else
+          git add .
+          git commit -m "chore: update versions [skip ci]"
+          git push origin testci
+        fi
+

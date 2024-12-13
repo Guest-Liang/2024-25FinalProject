@@ -2,6 +2,19 @@
 好像也没什么想说的，就是太麻烦了还有填一堆表格，什么甘特图什么中期目标   
 明明一个月就能干完的活…
 
+# commit规范
+| commit信息 | 触发action动作 |
+| --- | --- |
+| apifix | api版本号patch更新 |
+| apifeat | api版本号minor更新 |
+| apibreaking | api版本号major更新 |
+| elefix | electron版本号patch更新 |
+| elefeat | electron版本号minor更新 |
+| elebreaking | electron版本号major更新 |
+
+`注意，后三个触发时会同步更新package.json中的版本号`
+
+
 # 编译
 [![wakatime](https://wakatime.com/badge/user/0985cb7f-21b8-4ea5-86a4-5e6ba93cb575/project/3eb63dd6-fb69-469e-a7de-4cd19eb66177.svg)](https://wakatime.com/badge/user/0985cb7f-21b8-4ea5-86a4-5e6ba93cb575/project/3eb63dd6-fb69-469e-a7de-4cd19eb6617.svg)   
 
