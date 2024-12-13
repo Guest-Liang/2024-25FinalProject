@@ -1,20 +1,11 @@
-name: Electron Build
+name: Electron Build and Release
 
 on:
   workflow_dispatch:
-    inputs:
-      custom_name:
-        description: 'Workflow run name'
-        required: false
-        default: 'Electron Build'
-
-  push:
-    branches:
-      - test-ci
 
 jobs:
   build:
-    name: ${{ github.event.inputs.custom_name || 'Electron Build' }} - ${{ github.run_id }} - ${{ matrix.platform }} - ${{ matrix.os }}
+    name: ${{ github.event.inputs.custom_name || 'Electron Build' }} - ${{ matrix.platform }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}  # use matrix.os to specify different running environment
 
     strategy:
@@ -129,3 +120,114 @@ jobs:
         with:
           name: electron-build-${{ matrix.platform }}-${{ matrix.os }}
           path: ./upload
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download Linux Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: electron-build-linux-ubuntu-latest
+        path: ./build
+
+    - name: Download Windows Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: electron-build-win-windows-latest
+        path: ./build
+
+    - name: Retrieve Versions
+      id: get_versions
+      run: |
+        API_VERSION=$(grep 'Version\s*=\s*"v' backend/Configs.py | sed -E 's/.*Version\s*=\s*"v([^"]+)".*/\1/')
+        ELE_VERSION=$(grep -A 5 'class Electron:' backend/Configs.py | grep 'Version\s*=' | sed -E 's/.*=\s*"([^"]+)".*/\1/')
+        export API_VERSION
+        export ELE_VERSION
+
+        echo "API_VERSION=$API_VERSION" >> $GITHUB_ENV
+        echo "ELE_VERSION=$ELE_VERSION" >> $GITHUB_ENV
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      with:
+        # 使用临时tag，稍后在GitHub中手动编辑
+        tag_name: "temp-draft-tag"
+        release_name: "Electron v${{ env.ELE_VERSION }}, Django API v${{ env.API_VERSION }}"
+        body: ""
+        draft: true
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: ls file in final
+      shell: bash
+      run: ls build/
+
+    - name: Find Linux file
+      id: find_linux
+      run: |
+        FILE=$(ls build/*.tar.gz | head -n 1)
+        BASENAME=$(basename "$FILE")
+        echo "LINUX_FILE=$FILE" >> $GITHUB_ENV
+        echo "LINUX_BASENAME=$BASENAME" >> $GITHUB_ENV
+        export LINUX_FILE
+        export LINUX_BASENAME
+
+    - name: Upload Linux Release Asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.LINUX_FILE }}
+        asset_name: ${{ env.LINUX_BASENAME }}
+        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+    - name: Find Windows exe file
+      id: find_windows_exe
+      run: |
+        EXE_FILE=$(ls build/*.exe | head -n 1)
+        EXE_BASENAME=$(basename "$EXE_FILE")
+        echo "WIN_EXE_FILE=$EXE_FILE" >> $GITHUB_ENV
+        echo "WIN_EXE_BASENAME=$EXE_BASENAME" >> $GITHUB_ENV
+        export WIN_EXE_FILE
+        export WIN_EXE_BASENAME
+
+    - name: Upload Windows Release Asset #1
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.WIN_EXE_FILE }}
+        asset_name: ${{ env.WIN_EXE_BASENAME }}
+        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+    - name: Find Windows zip file
+      id: find_windows_zip
+      run: |
+        ZIP_FILE=$(ls build/*.zip | head -n 1)
+        ZIP_BASENAME=$(basename "$ZIP_FILE")
+        echo "WIN_ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
+        echo "WIN_ZIP_BASENAME=$ZIP_BASENAME" >> $GITHUB_ENV
+        export WIN_ZIP_FILE
+        export WIN_ZIP_BASENAME
+
+    - name: Upload Windows Release Asset #2
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.WIN_ZIP_FILE }}
+        asset_name: ${{ env.WIN_ZIP_BASENAME }}
+        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

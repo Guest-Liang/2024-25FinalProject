@@ -72,9 +72,6 @@ def DecryptFile(EncryptedFileString):
     Key2 = base64.urlsafe_b64decode(EncodedKey2)
     Key3 = base64.urlsafe_b64decode(EncodedKey3)
 
-    # # 从文件名中提取原始文件扩展名
-    # DecodedFileName = base64.urlsafe_b64decode(Part1Name).decode()
-    # OriginalExtension = DecodedFileName.split('_')[0]
 
     with open(os.path.join(settings.STORAGE_DIR, Part1Name), 'rb') as F:
         EncryptedPart1 = F.read()

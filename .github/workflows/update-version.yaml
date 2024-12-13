@@ -1,0 +1,139 @@
+name: Update Version Based on Commits
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set git config
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install backend Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+      working-directory: ./backend
+
+    - name: Determine version based on commit message
+      id: determine_version
+      shell: bash
+      run: |
+        LAST_COMMIT=$(git log -1 --pretty=%B)
+        echo "Last commit: $LAST_COMMIT"
+        echo "api_version_type=" >> $GITHUB_ENV
+        echo "ele_version_type=" >> $GITHUB_ENV
+        export api_version_type
+        export ele_version_type
+
+        if echo "$LAST_COMMIT" | grep -q "apibreaking"; then
+          echo "api_version_type=major" >> $GITHUB_ENV
+        elif echo "$LAST_COMMIT" | grep -q "apifeat"; then
+          echo "api_version_type=minor" >> $GITHUB_ENV
+        elif echo "$LAST_COMMIT" | grep -q "apifix"; then
+          echo "api_version_type=patch" >> $GITHUB_ENV
+        fi
+
+        if echo "$LAST_COMMIT" | grep -q "elebreaking"; then
+          echo "ele_version_type=major" >> $GITHUB_ENV
+        elif echo "$LAST_COMMIT" | grep -q "elefeat"; then
+          echo "ele_version_type=minor" >> $GITHUB_ENV
+        elif echo "$LAST_COMMIT" | grep -q "elefix"; then
+          echo "ele_version_type=patch" >> $GITHUB_ENV
+        fi
+      env: 
+        api_version_type: ${{ env.api_version_type }}
+        ele_version_type: ${{ env.ele_version_type }}
+
+    - name: Record old versions
+      id: record_old_versions
+      run: |
+        API_OLD_VERSION=$(grep 'Version\s*=\s*"v' backend/Configs.py | sed -E 's/.*Version\s*=\s*"v([^"]+)".*/\1/')
+        ELE_OLD_VERSION=$(grep 'Version\s*=\s*"[0-9]' backend/Configs.py | sed -E 's/.*Version\s*=\s*"([^"]+)".*/\1/' | tail -n1)
+        export API_OLD_VERSION
+        export ELE_OLD_VERSION
+
+        echo "API_OLD_VERSION=$API_OLD_VERSION" >> $GITHUB_ENV
+        echo "ELE_OLD_VERSION=$ELE_OLD_VERSION" >> $GITHUB_ENV
+
+    - name: Print version
+      run: |
+        echo "API Version Type: ${{ env.api_version_type }}"
+        echo "Electron Version Type: ${{ env.ele_version_type }}"
+        echo "API Old Version: ${{ env.API_OLD_VERSION }}"
+        echo "Electron Old Version: ${{ env.ELE_OLD_VERSION }}"
+
+    - name: Bump versions using Python
+      run: |
+        # 同时检查API和Electron两个类型，如果有就执行对应升级
+        if [ -n "${{ env.api_version_type }}" ]; then
+          if [ "${{ env.api_version_type }}" = "major" ]; then
+            python backend/Configs.py --api-major
+          elif [ "${{ env.api_version_type }}" = "minor" ]; then
+            python backend/Configs.py --api-minor
+          elif [ "${{ env.api_version_type }}" = "patch" ]; then
+            python backend/Configs.py --api-patch
+          fi
+        fi
+
+        if [ -n "${{ env.ele_version_type }}" ]; then
+          if [ "${{ env.ele_version_type }}" = "major" ]; then
+            python backend/Configs.py --electron-major
+          elif [ "${{ env.ele_version_type }}" = "minor" ]; then
+            python backend/Configs.py --electron-minor
+          elif [ "${{ env.ele_version_type }}" = "patch" ]; then
+            python backend/Configs.py --electron-patch
+          fi
+
+          # Electron更新完成后同步前端package.json
+          python backend/Configs.py --sync-packagejson
+        fi
+
+    - name: Get new versions
+      if: always()
+      id: get_new_versions
+      run: |
+        # 再次获取更新后的版本号
+        API_NEW_VERSION=$(grep 'Version\s*=\s*"v' backend/Configs.py | sed -E 's/.*Version\s*=\s*"v([^"]+)".*/\1/')
+        ELE_NEW_VERSION=$(grep 'Version\s*=\s*"[0-9]' backend/Configs.py | sed -E 's/.*Version\s*=\s*"([^"]+)".*/\1/' | tail -n1)
+        export API_NEW_VERSION
+        export ELE_NEW_VERSION
+
+        echo "API_NEW_VERSION=$API_NEW_VERSION" >> $GITHUB_ENV
+        echo "ELE_NEW_VERSION=$ELE_NEW_VERSION" >> $GITHUB_ENV
+
+    - name: Commit and push changes
+      run: |
+        if [ -z "${{ env.api_version_type }}" ] && [ -z "${{ env.ele_version_type }}" ]; then
+          echo "No version updates needed, skipping commit and push."
+        else
+          COMMIT_MSG="chore: update"
+          
+          if [ -n "${{ env.api_version_type }}" ] && [ -n "${{ env.ele_version_type }}" ]; then
+            COMMIT_MSG="$COMMIT_MSG API version from ${API_OLD_VERSION} to ${API_NEW_VERSION} and Electron version from ${ELE_OLD_VERSION} to ${ELE_NEW_VERSION} [skip ci]"
+          elif [ -n "${{ env.api_version_type }}" ]; then
+            COMMIT_MSG="$COMMIT_MSG API version from ${API_OLD_VERSION} to ${API_NEW_VERSION} [skip ci]"
+          elif [ -n "${{ env.ele_version_type }}" ]; then
+            COMMIT_MSG="$COMMIT_MSG Electron version from ${ELE_OLD_VERSION} to ${ELE_NEW_VERSION} [skip ci]"
+          fi
+
+          git add .
+          git commit -m "$COMMIT_MSG"
+            git push origin main
+        fi
