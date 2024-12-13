@@ -166,13 +166,13 @@ jobs:
 
     - name: ls file in final
       shell: bash
-      run: ls final/
+      run: ls build/
 
     - name: Find Linux file
       id: find_linux
       run: |
         # 找出 final 目录下的 *.tar.gz 文件
-        FILE=$(ls final/*.tar.gz | head -n 1)
+        FILE=$(ls build/*.tar.gz | head -n 1)
         echo "LINUX_FILE=$FILE" >> $GITHUB_ENV
         export LINUX_FILE
 
@@ -190,7 +190,7 @@ jobs:
     - name: Find Windows exe file
       id: find_windows_exe
       run: |
-        EXE_FILE=$(ls final/*.exe | head -n 1)
+        EXE_FILE=$(ls build/*.exe | head -n 1)
         echo "WIN_EXE_FILE=$EXE_FILE" >> $GITHUB_ENV
         export WIN_EXE_FILE
 
@@ -207,7 +207,7 @@ jobs:
     - name: Find Windows zip file
       id: find_windows_zip
       run: |
-        ZIP_FILE=$(ls final/*.zip | head -n 1)
+        ZIP_FILE=$(ls build/*.zip | head -n 1)
         echo "WIN_ZIP_FILE=$ZIP_FILE" >> $GITHUB_ENV
         export WIN_ZIP_FILE
 
