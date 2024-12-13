@@ -192,8 +192,8 @@ const uploadFiles = async () => {
     background: 'rgba(0, 0, 0, 0.6)',
   })
 
-  let RawEncryptFileList = toRaw(encryptFileList.value)
-  let RawCustomImageList = toRaw(customImageList.value)
+  const RawEncryptFileList = toRaw(encryptFileList.value)
+  const RawCustomImageList = toRaw(customImageList.value)
 
   const formData = new FormData()
   RawEncryptFileList.forEach((file) => {

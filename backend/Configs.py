@@ -25,14 +25,12 @@ def update_api_version(increment_type="patch"):
         with open(__file__, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # 匹配API版本号 vX.X.X 格式 (捕获数字部分)
         pattern = r'(Version\s*=\s*"v)(\d+\.\d+\.\d+)(")'
         match = re.search(pattern, content)
         if match:
             old_version = match.group(2)
             parts = old_version.split(".")
 
-            # 根据increment_type决定如何递增版本
             if increment_type == "major":
                 parts[0] = str(int(parts[0]) + 1)
                 parts[1] = "0"
@@ -40,7 +38,7 @@ def update_api_version(increment_type="patch"):
             elif increment_type == "minor":
                 parts[1] = str(int(parts[1]) + 1)
                 parts[2] = "0"
-            else:  # 默认patch
+            else:
                 parts[2] = str(int(parts[2]) + 1)
 
             new_version = ".".join(parts)
@@ -57,14 +55,12 @@ def update_electron_version(increment_type="patch"):
         with open(__file__, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # 匹配Electron版本号 X.X.X 格式
         pattern = r'(Version\s*=\s*")(\d+\.\d+\.\d+)(")'
         match = re.search(pattern, content)
         if match:
             old_version = match.group(2)
             parts = old_version.split(".")
 
-            # 根据increment_type决定如何递增版本
             if increment_type == "major":
                 parts[0] = str(int(parts[0]) + 1)
                 parts[1] = "0"
@@ -72,7 +68,7 @@ def update_electron_version(increment_type="patch"):
             elif increment_type == "minor":
                 parts[1] = str(int(parts[1]) + 1)
                 parts[2] = "0"
-            else:  # 默认patch
+            else:
                 parts[2] = str(int(parts[2]) + 1)
 
             new_version = ".".join(parts)
