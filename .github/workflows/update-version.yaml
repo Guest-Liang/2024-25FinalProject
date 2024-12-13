@@ -62,11 +62,23 @@ jobs:
         api_version_type: ${{ env.api_version_type }}
         ele_version_type: ${{ env.ele_version_type }}
 
-    - name: Print determined version
+    - name: Record old versions
+        id: record_old_versions
+        run: |
+          API_OLD_VERSION=$(grep 'Version\s*=\s*"v' backend/Configs.py | sed -E 's/.*Version\s*=\s*"v([^"]+)".*/\1/')
+          ELE_OLD_VERSION=$(grep 'Version\s*=\s*"[0-9]' backend/Configs.py | sed -E 's/.*Version\s*=\s*"([^"]+)".*/\1/' | tail -n1)
+          export API_OLD_VERSION
+          export ELE_OLD_VERSION
+
+          echo "API_OLD_VERSION=$API_OLD_VERSION" >> $GITHUB_ENV
+          echo "ELE_OLD_VERSION=$ELE_OLD_VERSION" >> $GITHUB_ENV
+
+    - name: Print version
       run: |
         echo "API Version Type: ${{ env.api_version_type }}"
         echo "Electron Version Type: ${{ env.ele_version_type }}"
-
+        echo "API Old Version: ${{ env.API_OLD_VERSION }}"
+        echo "Electron Old Version: ${{ env.ELE_OLD_VERSION }}"
 
     - name: Bump versions using Python
       run: |
@@ -94,13 +106,35 @@ jobs:
           python backend/Configs.py --sync-packagejson
         fi
 
+    - name: Get new versions
+      if: always()
+      id: get_new_versions
+      run: |
+        # 再次获取更新后的版本号
+        API_NEW_VERSION=$(grep 'Version\s*=\s*"v' backend/Configs.py | sed -E 's/.*Version\s*=\s*"v([^"]+)".*/\1/')
+        ELE_NEW_VERSION=$(grep 'Version\s*=\s*"[0-9]' backend/Configs.py | sed -E 's/.*Version\s*=\s*"([^"]+)".*/\1/' | tail -n1)
+        export API_NEW_VERSION
+        export ELE_NEW_VERSION
+
+        echo "API_NEW_VERSION=$API_NEW_VERSION" >> $GITHUB_ENV
+        echo "ELE_NEW_VERSION=$ELE_NEW_VERSION" >> $GITHUB_ENV
+
     - name: Commit and push changes
       run: |
         if [ -z "${{ env.api_version_type }}" ] && [ -z "${{ env.ele_version_type }}" ]; then
           echo "No version updates needed, skipping commit and push."
         else
+          COMMIT_MSG="chore: update"
+          
+          if [ -n "${{ env.api_version_type }}" ] && [ -n "${{ env.ele_version_type }}" ]; then
+            COMMIT_MSG="$COMMIT_MSG API version from ${API_OLD_VERSION} to ${API_NEW_VERSION} and Electron version from ${ELE_OLD_VERSION} to ${ELE_NEW_VERSION} [skip ci]"
+          elif [ -n "${{ env.api_version_type }}" ]; then
+            COMMIT_MSG="$COMMIT_MSG API version from ${API_OLD_VERSION} to ${API_NEW_VERSION} [skip ci]"
+          elif [ -n "${{ env.ele_version_type }}" ]; then
+            COMMIT_MSG="$COMMIT_MSG Electron version from ${ELE_OLD_VERSION} to ${ELE_NEW_VERSION} [skip ci]"
+          fi
+
           git add .
-          git commit -m "chore: update versions [skip ci]"
+          git commit -m "$COMMIT_MSG"
           git push origin testci
         fi
-
