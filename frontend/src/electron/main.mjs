@@ -11,7 +11,54 @@ let isDev = process.env.NODE_ENV === 'development'
 let win
 let djangoProcess
 let djangoExecutePath
+let currentLanguage = 'en-US' // 默认语言
 
+const menuConfig = {
+  'en-US': {
+    file: 'File',
+    clearCache: 'Clear Cache',
+    exit: 'Exit',
+    edit: 'Edit',
+    cut: 'Cut',
+    copy: 'Copy',
+    paste: 'Paste',
+    language: 'Language',
+    help: 'Help',
+    about: 'About',
+    aboutMessage: 'This app was developed by Guest Liang.',
+    aboutDetail: 'For more information, visit https://github.com/Guest-Liang.',
+    cacheCleared: 'Cache cleared successfully!',
+    cacheClearedTitle: 'Cache Cleared',
+    reload: 'Reload',
+    customAction: 'Custom Action',
+    customActionMessage: 'Custom action triggered!',
+    toggleDevTools: 'Toggle Developer Tools'
+  },
+  'zh-CN': {
+    file: '文件',
+    clearCache: '清除缓存',
+    exit: '退出',
+    edit: '编辑',
+    cut: '剪切',
+    copy: '复制',
+    paste: '粘贴',
+    language: '语言',
+    help: '帮助',
+    about: '关于',
+    aboutMessage: '此应用由 Guest Liang 开发',
+    aboutDetail: '更多信息请访问 https://github.com/Guest-Liang',
+    cacheCleared: '缓存清除成功！',
+    cacheClearedTitle: '缓存已清除',
+    reload: '重新加载',
+    customAction: '自定义操作',
+    customActionMessage: '自定义操作已触发！',
+    toggleDevTools: '开发者工具'
+  }
+}
+
+/**
+ * 退出Django进程
+ */
 const killDjangoProcess = () => {
   let command
   if (process.platform === 'win32') {
@@ -33,12 +80,15 @@ const killDjangoProcess = () => {
   })
 }
 
+/**
+ * 启动Django服务
+ */
 function startDjangoServer() {
   // sometimes use dev mode
   if (process.platform === 'win32') {
     djangoExecutePath = path.join(
-      __dirname, 
-      isDev ? '../backend/dist/windows/DjangoRestfulAPI.exe' : '../APIDataDir/DjangoRestfulAPI.exe'
+      __dirname,
+      isDev ? '../../../backend/dist/windows/DjangoRestfulAPI.exe' : '../../../APIDataDir/DjangoRestfulAPI.exe'
     )
   } else if (process.platform === 'linux') {
     djangoExecutePath = path.join(
@@ -92,6 +142,9 @@ function startDjangoServer() {
   }
 }
 
+/**
+ * 创建窗口
+ */
 function createWindow() {
   win = new BrowserWindow({
     width: 1280,
@@ -99,9 +152,9 @@ function createWindow() {
     minWidth: 500,
     minHeight: 300,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      devTools: isDev,
-      nodeIntegration: false,
+      preload: path.join(__dirname, 'preload.mjs'),
+      devTools: true,
+      nodeIntegration: true,
       contextIsolation: true,
       webSecurity: false,
       cache: 'no-store',
@@ -119,88 +172,145 @@ function createWindow() {
   console.log('[createWindow] Waiting window starting...')
   startDjangoServer()
 
-  const menuTemplate = [
-    {
-      label: 'File',
-      submenu: [
-        {
-          label: 'Clear Cache',
-          click: () => {
-            const win = BrowserWindow.getFocusedWindow()
-            if (win) {
-              win.webContents.session.clearCache().then(() => {
-                dialog.showMessageBox({
-                  type: 'info',
-                  title: 'Cache Cleared',
-                  message: 'Cache cleared successfully!',
-                  buttons: ['OK']
-                })
-              })
-            }
-          },
-        },
-        { type: 'separator' },
-        { label: 'Exit', role: 'quit' }
-      ]
-    },
-    {
-      label: 'Edit',
-      submenu: [
-        { label: 'Cut', role: 'cut' },
-        { label: 'Copy', role: 'copy' },
-        { label: 'Paste', role: 'paste' },
-      ]
-    },
-    {
-      label: 'View',
-      submenu: [
-        { label: 'Refresh', accelerator: 'F5', click: () => win.reload() },
-      ]
-    },
-    {
-      label: 'Help',
-      submenu: [
-        {
-          label: 'About',
-          click: () => {
-            dialog.showMessageBox({
-              type: 'info',
-              title: 'About',
-              message: 'This app was developed by Guest Liang.',
-              detail: 'For more information, visit https://github.com/Guest-Liang.',
-              buttons: ['OK']
-            })
-          },
-        }
-      ]
-    }
-  ]
-
-  const menu = Menu.buildFromTemplate(menuTemplate)
-  Menu.setApplicationMenu(menu)
-
-  win.webContents.on('context-menu', (event, params) => {
-    const contextMenu = Menu.buildFromTemplate([
-      { label: 'Reload', click: () => win.reload() },
-      { label: 'Copy', role: 'copy', enabled: params.editFlags.canCopy },
-      { label: 'Paste', role: 'paste', enabled: params.editFlags.canPaste },
-      { type: 'separator' },
-      { label: 'Custom Action', click: () => {
-          console.log('Custom action triggered!')
-        }
-      }
-    ])
-    contextMenu.popup(win)
-  })
+  updateMenu() // 初始化菜单
+  setupContextMenu() // 右键菜单
 
   win.on('closed', () => {
     win = null
   })
 }
 
+/**
+ * 动态构建菜单
+ */
+function buildMenu() {
+  const langMenu = menuConfig[currentLanguage];
+
+  return [
+    {
+      label: langMenu.file,
+      submenu: [
+        {
+          label: langMenu.clearCache,
+          click: () => {
+            const win = BrowserWindow.getFocusedWindow()
+            if (win) {
+              win.webContents.session.clearCache().then(() => {
+                dialog.showMessageBox({
+                  type: 'info',
+                  title: langMenu.cacheClearedTitle,
+                  message: langMenu.cacheCleared,
+                  buttons: ['OK']
+                })
+              })
+            }
+          }
+        },
+        { type: 'separator' },
+        { label: langMenu.exit, role: 'quit' }
+      ]
+    },
+    {
+      label: langMenu.edit,
+      submenu: [
+        { label: langMenu.cut, role: 'cut' },
+        { label: langMenu.copy, role: 'copy' },
+        { label: langMenu.paste, role: 'paste' },
+      ]
+    },
+    {
+      label: langMenu.language,
+      submenu: [
+        {
+          label: currentLanguage === 'en-US' ? 'English' : '英语',
+          type: 'radio',
+          checked: currentLanguage === 'en-US',
+          click: () => changeLanguage('en-US')
+        },
+        {
+          label: currentLanguage === 'en-US' ? 'Chinese' : '简体中文',
+          type: 'radio',
+          checked: currentLanguage === 'zh-CN',
+          click: () => changeLanguage('zh-CN')
+        }
+      ]
+    },
+    {
+      label: langMenu.help,
+      submenu: [
+        {
+          label: langMenu.about,
+          click: () => {
+            dialog.showMessageBox({
+              type: 'info',
+              title: langMenu.about,
+              message: langMenu.aboutMessage,
+              detail: langMenu.aboutDetail,
+              buttons: ['OK']
+            })
+          }
+        },
+        {
+          label: langMenu.toggleDevTools,
+          accelerator: 'F12',
+          click: () => win.webContents.openDevTools({ mode: 'detach' })
+        }
+      ]
+    }
+  ]
+}
+
+/**
+ * 更新菜单
+ */
+function updateMenu() {
+  const menu = Menu.buildFromTemplate(buildMenu())
+  Menu.setApplicationMenu(menu)
+}
+
+/**
+ * 切换语言，通知 Vue
+ * @param {string} lang - 语言代码， 'en-US' 或 'zh-CN'
+ */
+function changeLanguage(lang) {
+  currentLanguage = lang
+  updateMenu()
+  console.log('[Electron] Sending change-language IPC event to Vue:', lang) // 记录 IPC 发送情况
+  if (win) {
+    win.webContents.send('change-language', lang) // 发送事件给 Vue
+    console.log(currentLanguage === 'en-US' ? `[changeLanguage] Language changed to ${lang}` : `[changeLanguage] 语言已切换为 ${lang}`)
+  } else {
+    console.error('[Electron] No window found for IPC event') // 窗口可能丢失
+  }
+}
+
+/**
+ * 右键菜单
+ */
+function setupContextMenu() {
+  win.webContents.on('context-menu', (event, params) => {
+    const langMenu = menuConfig[currentLanguage]
+
+    const contextMenu = Menu.buildFromTemplate([
+      { label: langMenu.reload || 'Reload', click: () => win.reload() },
+      { label: langMenu.copy || 'Copy', role: 'copy', enabled: params.editFlags.canCopy },
+      { label: langMenu.paste || 'Paste', role: 'paste', enabled: params.editFlags.canPaste },
+      { type: 'separator' },
+      {
+        label: langMenu.customAction || 'Custom Action',
+        click: () => {
+          console.log(langMenu.customActionMessage || 'Custom action triggered!');
+        }
+      }
+    ])
+    contextMenu.popup(win)
+  })
+}
+
+
 app.whenReady().then(() => {
   createWindow()
-  
+
   win.on('closed', () => {
     if (win) {
       if (djangoProcess) {

@@ -17,6 +17,7 @@
         </el-header>
         <el-main>
           <component :is="currentComponent" />
+          {{ $t('greeting') }}
         </el-main>
       </el-container>
 
@@ -28,7 +29,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue'
+import i18next from 'i18next'
+onMounted(() => {
+  console.log('[Vue] onMounted, checking window.electron:', window.electron) // 检查 window.electron 是否存在
+
+  if (window.electron?.changeLanguage) {
+    console.log('[Vue] Listening for language change') // 确保监听
+    window.electron.changeLanguage((lang) => {
+      console.log('[Vue] Received language change:', lang) // 是否收到 IPC 事件
+      i18next.changeLanguage(lang).then(() => {
+        console.log('[Vue] Language changed to:', i18next.language) // Vue 端是否真的切换
+      })
+    })
+  } else {
+    console.error('[Vue] window.electron.changeLanguage is undefined') // 说明 Vue 没正确注入 Electron API
+  }
+})
+
+import { ref, shallowRef, onMounted } from 'vue'
 
 import HomeView from './views/HomeView.vue'
 import EncryptionView from './views/EncryptionView.vue'

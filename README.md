@@ -18,7 +18,7 @@
 # 编译
 [![wakatime](https://wakatime.com/badge/user/0985cb7f-21b8-4ea5-86a4-5e6ba93cb575/project/3eb63dd6-fb69-469e-a7de-4cd19eb66177.svg)](https://wakatime.com/badge/user/0985cb7f-21b8-4ea5-86a4-5e6ba93cb575/project/3eb63dd6-fb69-469e-a7de-4cd19eb6617.svg)   
 
-backend， 产物在dist，开发环境python=3.12.7:   
+backend， 产物在dist，开发环境python=3.12.7（2025.2.13 更新至3.12.9）:   
 ```conda
 cd backend
 conda activate FinalProject
@@ -69,6 +69,25 @@ windows
 ubuntu
 ```bash
 ./DjangoRestfulAPI migrate
+```
+
+# 开发
+后端启动
+```powershell
+python manage.py runserver
+```
+前端启动
+```powershell
+pnpm dev
+```
+electron启动
+```powershell
+pnpm electron
+```
+electron错误提示
+```powershell
+pnpm install electron-fix
+electron-fix start
 ```
 
 ### 11.7日

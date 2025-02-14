@@ -10,11 +10,15 @@
   ],
   "include": [
     "src/**/*.ts", 
-    "src/types/**/*.d.ts"
+    "src/types/**/*",
+    "src/**/*.vue"
   ],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "outDir": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
   }
 }

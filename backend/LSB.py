@@ -1,6 +1,6 @@
 from PIL import Image
 import base64, logging
-logger =  logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def LSB_Encode(image_path, output_path, secret_message):
@@ -72,5 +72,5 @@ if __name__ == "__main__":
 
     DecodedMessage = LSB_Decode("output_image.png")
     print("Image Decoded message:", DecodedMessage)
-    DebasedMessage = base64.b64decode(DecodedMessage)
+    DebasedMessage = base64.urlsafe_b64decode(DecodedMessage)
     print("Base64 decoded message:", DebasedMessage)

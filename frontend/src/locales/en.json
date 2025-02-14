@@ -1,0 +1,12 @@
+{
+    "menu": {
+      "file": "File",
+      "edit": "Edit",
+      "view": "View",
+      "help": "Help",
+      "language": "Language",
+      "english": "English",
+      "chinese": "Chinese"
+    }
+  }
+  

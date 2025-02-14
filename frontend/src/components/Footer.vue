@@ -2,7 +2,7 @@
 
 <template>
   <div class="footer-content">
-    <p>&copy; 2024 GuestLiang</p>
+    <p>&copy; 2024-2025 GuestLiang</p>
     <el-text class="mx-1" type="success">https://github.com/Guest-Liang</el-text>
   </div>
 </template>

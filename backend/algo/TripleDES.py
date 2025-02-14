@@ -5,7 +5,6 @@ import os, logging
 from .PKCS5 import *
 logger = logging.getLogger(__name__)
 
-
 def TripleDES_Encrypt(data, key):
     if len(key) != 24:
         raise ValueError("3DES key must be 24 bytes")
@@ -28,9 +27,7 @@ def TripleDES_Decrypt(encrypted_data, key):
         iv = encrypted_data[:8]  # Extract the initialization vector
         encrypted_data = encrypted_data[8:]  # Remove IV from encrypted data
 
-        cipher = Cipher(
-            algorithms.TripleDES(key), modes.CBC(iv), backend=default_backend()
-        )
+        cipher = Cipher(algorithms.TripleDES(key), modes.CBC(iv), backend=default_backend())
         decryptor = cipher.decryptor()
 
         decrypted_data = decryptor.update(encrypted_data) + decryptor.finalize()
