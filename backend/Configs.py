@@ -8,7 +8,7 @@ class Config:
         Password = "fevsouzjombtbdgi"
 
     class API:
-        Version = "v0.1.5"
+        Version = "v0.1.6"
         AppName = "DjangoRestfulAPI"
         FileName = "DjangoRestfulAPI"
         CompanyName = "Guest Liang"
@@ -17,7 +17,7 @@ class Config:
 
     class Electron:
         Name = "guestliang-electron-app"
-        Version = "0.2.4" # Same as package.json
+        Version = "0.3.0" # Same as package.json
 
 
 def update_api_version(increment_type="patch"):
