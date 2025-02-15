@@ -86,9 +86,11 @@ pnpm electron
 ```
 electron错误提示
 ```powershell
-pnpm install electron-fix
+npm install electron-fix -g
 electron-fix start
 ```
 
-### 11.7日
-![81aab6cfb8d28ac35a775825c98b17b9](https://github.com/user-attachments/assets/5bc0c2d8-e689-4483-9c8e-05b890ea260a)   
+### 2024.11.7
+![2024 Nov 7](./image/2024.11.07.png)   
+### 2025.2.14
+![2025 Feb 14](./image/2025.02.14.png)

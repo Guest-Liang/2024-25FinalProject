@@ -123,14 +123,14 @@ jobs:
         if [ -z "${{ env.api_version_type }}" ] && [ -z "${{ env.ele_version_type }}" ]; then
           echo "No version updates needed, skipping commit and push."
         else
-          COMMIT_MSG="chore: update"
+          COMMIT_MSG=":arrow_up: chore: update"
           
           if [ -n "${{ env.api_version_type }}" ] && [ -n "${{ env.ele_version_type }}" ]; then
-            COMMIT_MSG="$COMMIT_MSG API version from ${API_OLD_VERSION} to ${API_NEW_VERSION} and Electron version from ${ELE_OLD_VERSION} to ${ELE_NEW_VERSION} [skip ci]"
+            COMMIT_MSG="$COMMIT_MSG API version from ${API_OLD_VERSION} to ${API_NEW_VERSION} and Electron App version from ${ELE_OLD_VERSION} to ${ELE_NEW_VERSION} [skip ci]"
           elif [ -n "${{ env.api_version_type }}" ]; then
             COMMIT_MSG="$COMMIT_MSG API version from ${API_OLD_VERSION} to ${API_NEW_VERSION} [skip ci]"
           elif [ -n "${{ env.ele_version_type }}" ]; then
-            COMMIT_MSG="$COMMIT_MSG Electron version from ${ELE_OLD_VERSION} to ${ELE_NEW_VERSION} [skip ci]"
+            COMMIT_MSG="$COMMIT_MSG Electron App version from ${ELE_OLD_VERSION} to ${ELE_NEW_VERSION} [skip ci]"
           fi
 
           git add .

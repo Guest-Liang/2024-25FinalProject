@@ -64,7 +64,8 @@
     "asar": false,
     "files": [
       "dist/**/*",
-      "src/electron/*"
+      "src/electron/*",
+      "src/locales/*"
     ],
     "extraResources": [
       {

@@ -3,6 +3,7 @@
     <div class="file-container">
       <el-upload
         action=""
+        :key="Keys.Upload"
         class="upload-component"
         :drag="true"
         multiple
@@ -14,8 +15,8 @@
         accept="*"
       >
         <i class="el-icon-upload"></i>
-        <div class="el-upload__text">Choose files that need to be hashed</div>
-        <div class="el-upload__tip">Support all file types</div>
+        <div class="el-upload__text">{{ $t('ToolsView.UploadText') }}</div>
+        <div class="el-upload__tip">{{ $t('ToolsView.UploadTips') }}</div>
       </el-upload>
 
       <div
@@ -24,6 +25,7 @@
       >
         <el-button
           type="primary"
+          :key="Keys.CalcHash"
           round
           @click="calculateHash"
           style="
@@ -34,10 +36,11 @@
             word-wrap: break-word;
           "
         >
-          Calculate Hash
+          {{ $t('ToolsView.CalcHashButton') }}
         </el-button>
         <el-button
           type="danger"
+          :key="Keys.CleanFile"
           round
           @click="cleanUploadFiles"
           style="
@@ -49,24 +52,46 @@
             word-wrap: break-word;
           "
         >
-          Clean up all files
+          {{ $t('ToolsView.CleanFileButton') }}
         </el-button>
       </div>
     </div>
 
     <div class="hash-table-container" v-if="hashResults.length > 0">
       <el-table :data="hashResults" border stripe>
-        <el-table-column prop="fileName" label="File Name" min-width="30%" />
-        <el-table-column prop="hash" label="SHA-256 Hash" min-width="70%" />
+        <el-table-column prop="fileName" :label="$t('ToolsView.ColumnLabel_Name')" min-width="30%" />
+        <el-table-column prop="hash" :label="$t('ToolsView.ColumnLabel_Hash')" min-width="70%" />
       </el-table>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, reactive } from 'vue'
 import CryptoJS from 'crypto-js'
 import { ElLoading, ElMessage } from 'element-plus'
+import i18next from 'i18next'
+
+let loading = null
+
+const Keys = reactive({
+  Upload: 0,
+  CalcHash: 0,
+  CleanFile: 0,
+  LoadingText: i18next.t('ToolsView.LoadingText'),
+  ErrorText: i18next.t('ToolsView.ErrorText'),
+})
+
+watch(() => i18next.language, () => {
+  Object.keys(Keys).forEach((key) => {
+    Keys[key]++
+  })
+  Keys.LoadingText = i18next.t('ToolsView.LoadingText')
+  if (loading) {
+    loading.setText(i18next.t('ToolsView.LoadingText'))
+  }
+  Keys.ErrorText = i18next.t('ToolsView.ErrorText')
+})
 
 const fileList = ref<File[]>([])
 const hashResults = ref<{ fileName: string; hash: string; raw: File }[]>([])
@@ -81,10 +106,10 @@ const cleanUploadFiles = () => {
 }
 
 const calculateHash = async () => {
-  const loading = ElLoading.service({
+  loading = ElLoading.service({
     target: '.tools',
     lock: true,
-    text: 'Calculating hash...',
+    text: i18next.t('ToolsView.LoadingText'),
     background: 'rgba(0, 0, 0, 0.6)',
   })
 
@@ -112,9 +137,9 @@ const getFileHash = (file: File): Promise<string> => {
 }
 
 const beforeUpload = (file: File) => {
-  const isValidSize = file.size / 1024 < 10 // Limit to 10GB
+  const isValidSize = file.size / 1024 / 1024 < 10 // 限制 10MB
   if (!isValidSize) {
-    ElMessage.error('Custom image size cannot exceed 10MB')
+    ElMessage.error(Keys.ErrorText)
   }
   return isValidSize
 }

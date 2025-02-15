@@ -1,0 +1,92 @@
+export interface I18nSchema {
+  greeting: string
+  Electron: {
+    file: string
+    clearCache: string
+    exit: string
+    edit: string
+    cut: string
+    copy: string
+    paste: string
+    language: string
+    help: string
+    about: string
+    aboutMessage: string
+    aboutDetail: string
+    cacheCleared: string
+    cacheClearedTitle: string
+    reload: string
+    customAction: string
+    customActionMessage: string
+    toggleDevTools: string
+  }
+  ToolsView: {
+    UploadText: string
+    UploadTips: string
+    CalcHashButton: string
+    CleanFileButton: string
+    ColumnLabel_Name: string
+    ColumnLabel_Hash: string
+    LoadingText: string
+    ErrorText: string
+  }
+  EncryptView: {
+    FileUploadText_nofile: string
+    FileUploadText_hasfile: string
+    FileUploadTips_nofile: string
+    FileUploadTips_hasfile: string
+    CustomImageUploadText_nofile: string
+    CustomImageUploadTips_nofile: string
+    CustomImageUploadTips_hasfile: string
+    UploadFileButton: string
+    CleanFileButton: string
+    GetbyEmail: string
+    EmailPlaceholder: string
+    DownloadLinks: string
+    ExceedMaxSizeMsg: string
+    NonePNGImageMsg: string
+    NoFileUploadMsg: string
+    InvalidEmailMsg: string
+    LoadingText: string
+    WaitingText: string
+    ErrorText: string
+    SuccessTitle: string
+    ErrorTitle: string
+    OKText: string
+  }
+  DecryptView: {
+    UploadText_nofile: string
+    UploadText_hasfile: string
+    UploadTips: string
+    UploadFileButton: string
+    CleanFileButton: string
+    DownloadLinks: string
+    ExceedMaxSizeMsg: string
+    NonePNGImageMsg: string
+    LoadingText: string
+    NoFileUploadMsg: string
+    WaitingText: string
+    SuccessTitle: string
+    ErrorText: string
+    ErrorTitle: string
+    OKText: string
+  }
+  Intro: {
+    Heading1: string
+    Paragraph1_1: string
+    Paragraph1_2: string
+    Heading2: string
+    Paragraph2: string
+    Heading3: string
+    Paragraph3_1: string
+    Paragraph3_2: string
+    Heading4: string
+    Paragraph4: string
+  }
+  Navigation: {
+    Home: string
+    Encryption: string
+    Decryption: string
+    Tools: string
+  }
+}

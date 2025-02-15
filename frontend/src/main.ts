@@ -11,20 +11,21 @@ import router from './router'
 import i18next from 'i18next'
 import I18NextVue from 'i18next-vue'
 
+import en from './locales/en-US.json'
+import zh from './locales/zh-CN.json'
+import type { I18nSchema } from './locales/types'
+
+ // TypeScript 校验 JSON 结构
+const enTyped: I18nSchema = en
+const zhTyped: I18nSchema = zh
+
 i18next.init({
   lng: 'en-US',
+  fallbackLng: 'en-US',
   resources: {
-    'zh-CN': {
-      translation: {
-        greeting: '你好，世界！',
-      },
-    },
-    'en-US': {
-      translation: {
-        greeting: 'Hello, World!',
-      },
-    },
-  },
+    'en-US': { translation: enTyped },
+    'zh-CN': { translation: zhTyped }
+  }
 })
 
 const app = createApp(App)

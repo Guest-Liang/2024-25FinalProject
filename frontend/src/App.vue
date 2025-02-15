@@ -4,20 +4,19 @@
       <el-aside>
         <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="75" height="75" />
         <div class="wrapper">
-          <el-button @click="showHome" type="primary" plain>Home</el-button>
-          <el-button @click="showEncryption" type="primary" plain>Encryption</el-button>
-          <el-button @click="showDecryption" type="primary" plain>Decryption</el-button>
-          <el-button @click="showTools" type="primary" plain>Tools</el-button>
+          <el-button @click="showHome" type="primary" plain>{{ $t('Navigation.Home') }}</el-button>
+          <el-button @click="showEncryption" type="primary" plain>{{ $t('Navigation.Encryption') }}</el-button>
+          <el-button @click="showDecryption" type="primary" plain>{{ $t('Navigation.Decryption') }}</el-button>
+          <el-button @click="showTools" type="primary" plain>{{ $t('Navigation.Tools') }}</el-button>
         </div>
       </el-aside>
 
       <el-container class="inner-el-container">
         <el-header>
-          <Header :cusheader="headerTitle"> </Header>
+          <Header :cusheader="$t(`Navigation.${selectedPage}`)"> </Header>
         </el-header>
         <el-main>
           <component :is="currentComponent" />
-          {{ $t('greeting') }}
         </el-main>
       </el-container>
 
@@ -42,7 +41,7 @@ onMounted(() => {
       })
     })
   } else {
-    console.error('[Vue] window.electron.changeLanguage is undefined') // 说明 Vue 没正确注入 Electron API
+    console.error('[Vue] window.electron.changeLanguage is undefined') // Vue 未正确注入 Electron API
   }
 })
 
@@ -57,26 +56,26 @@ import Footer from './components/Footer.vue'
 
 const currentComponent = shallowRef(HomeView)
 
-const headerTitle = ref('Home')
+const selectedPage = ref('Home')
 
 const showHome = () => {
   currentComponent.value = HomeView
-  headerTitle.value = 'Home'
+  selectedPage.value = 'Home'
 }
 
 const showEncryption = () => {
   currentComponent.value = EncryptionView
-  headerTitle.value = 'Encryption'
+  selectedPage.value = 'Encryption'
 }
 
 const showDecryption = () => {
   currentComponent.value = DecryptionView
-  headerTitle.value = 'Decryption'
+  selectedPage.value = 'Decryption'
 }
 
 const showTools = () => {
   currentComponent.value = ToolsView
-  headerTitle.value = 'Tools'
+  selectedPage.value = 'Tools'
 }
 </script>
 

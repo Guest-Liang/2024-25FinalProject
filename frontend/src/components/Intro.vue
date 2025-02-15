@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import ChoiceItem from './ChoiceItem.vue'
 import EncryptionIcon from './icons/IconEncryption.vue'
@@ -9,35 +10,30 @@ import CommunityIcon from './icons/IconCommunity.vue'
 <template>
   <ChoiceItem>
     <template #icon><EncryptionIcon /></template>
-    <template #heading>Encryption</template>
-
-    😆Just upload your file and get the encoded image as your key.
+    <template #heading>{{ $t('Intro.Heading1') }}</template>
+    {{ $t('Intro.Paragraph1_1') }}
     <br />
-    😍😍You can also upload a picture you like as your key to the file.
+    {{ $t('Intro.Paragraph1_2') }}
   </ChoiceItem>
 
   <ChoiceItem>
     <template #icon><DecryptionIcon /></template>
-    <template #heading>Decryption</template>
-
-    😉You can get your file by uploading your key image.
+    <template #heading>{{ $t('Intro.Heading2') }}</template>
+    {{ $t('Intro.Paragraph2') }}
   </ChoiceItem>
 
   <ChoiceItem>
     <template #icon><ToolingIcon /></template>
-    <template #heading>Tools</template>
-
-    🧐Check file hash value. Even compare two files at the same time
+    <template #heading>{{ $t('Intro.Heading3') }}</template>
+    {{ $t('Intro.Paragraph3_1') }}
     <br />
-
-    ...More tools are coming soon.
+    {{ $t('Intro.Paragraph3_2') }}
   </ChoiceItem>
 
   <ChoiceItem>
     <template #icon><CommunityIcon /></template>
-    <template #heading>Contact</template>
-
-    🤔Got stuck? Ask question on
+    <template #heading>{{ $t('Intro.Heading4') }}</template>
+    {{ $t('Intro.Paragraph4') }}
     <el-text class="mx-1" type="success">https://github.com/Guest-Liang</el-text>.
   </ChoiceItem>
 </template>
