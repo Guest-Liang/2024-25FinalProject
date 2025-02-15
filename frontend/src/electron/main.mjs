@@ -19,7 +19,18 @@ let currentLanguage = 'en-US' // 默认语言
  * 读取 JSON 文件
  */
 function loadJsonFile(filename) {
-  const filePath = path.join(__dirname, `../locales/${filename}`)
+  let filePath
+  if (process.platform === 'win32') {
+    filePath = path.join(__dirname, `../locales/${filename}`)
+  } else if (process.platform === 'linux') {
+    filePath = path.normalize(path.join('/', __dirname, `../locales/${filename}`))
+    filePath = decodeURIComponent(filePath)
+  } else {
+    console.log('Unsupported platform.')
+    filePath = path.join(__dirname, `../locales/${filename}`)
+    exit(1)
+  }
+
   try {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'))
   } catch (error) {
@@ -122,13 +133,23 @@ function startDjangoServer() {
  * 创建窗口
  */
 function createWindow() {
+  let preloadPath
+  if (process.platform === 'win32') {
+    preloadPath = path.join(__dirname, 'preload.mjs')
+  } else if (process.platform === 'linux') {
+    preloadPath = path.normalize(path.join('/', __dirname, 'preload.mjs'))
+    preloadPath = decodeURIComponent(preloadPath)
+  } else {
+    console.log('Unsupported platform.')
+    exit(1)
+  }
   win = new BrowserWindow({
     width: 1280,
     height: 720,
     minWidth: 500,
     minHeight: 300,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.mjs'),
+      preload: preloadPath,
       devTools: true,
       nodeIntegration: true,
       contextIsolation: true,
