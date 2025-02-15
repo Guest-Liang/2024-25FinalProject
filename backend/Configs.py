@@ -17,7 +17,7 @@ class Config:
 
     class Electron:
         Name = "guestliang-electron-app"
-        Version = "0.3.0" # Same as package.json
+        Version = "1.0.0" # Same as package.json
 
 
 def update_api_version(increment_type="patch"):
