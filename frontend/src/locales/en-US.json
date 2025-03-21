@@ -22,7 +22,7 @@
   },
   "ToolsView": {
     "UploadText": "Choose files that need to be hashed",
-    "UploadTips": "Support all file types, the recommended size does not exceed 100MB",
+    "UploadTips": "(Support all file types, the recommended size does not exceed 100MB)",
     "CalcHashButton": "Calculate Hash",
     "CleanFileButton": "Clean up all files",
     "ColumnLabel_Name": "File Name",
@@ -33,8 +33,8 @@
   "EncryptView": {
     "FileUploadText_nofile": "Choose files that needs to be encrypted",
     "FileUploadText_hasfile": "List of chosen files",
-    "FileUploadTips_nofile": "Support all file type",
-    "FileUploadTips_hasfile": "Files are ready",
+    "FileUploadTips_nofile": "(Support all file type)",
+    "FileUploadTips_hasfile": "(Files are ready)",
     "CustomImageUploadText_nofile": "Select a custom image",
     "CustomImageUploadTips_nofile": "Only PNG images are supported",
     "CustomImageUploadTips_hasfile": "Already selected 1 image!",
@@ -57,7 +57,7 @@
   "DecryptView": {
     "UploadText_nofile": "Select the images you want to decrypt",
     "UploadText_hasfile": "List of chosen files",
-    "UploadTips": "Only PNG images are supported",
+    "UploadTips": "(Only PNG images are supported)",
     "UploadFileButton": "Upload to Server",
     "CleanFileButton": "Clean up all files",
     "DownloadLinks": "Download Links",

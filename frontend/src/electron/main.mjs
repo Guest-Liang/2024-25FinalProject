@@ -148,6 +148,7 @@ function createWindow() {
     height: 720,
     minWidth: 500,
     minHeight: 300,
+    icon: path.normalize(path.join(process.platform === 'linux'? '/': '', __dirname, '../assets/GuestLianglogo.png')),
     webPreferences: {
       preload: preloadPath,
       devTools: true,

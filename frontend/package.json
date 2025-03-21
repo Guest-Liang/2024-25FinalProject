@@ -19,11 +19,15 @@
     "lint:eslint": "eslint . --fix",
     "lint": "run-s lint:*",
     "format": "prettier --write src/",
-    "fix": "electron-fix start"
+    "fix": "electron-fix start",
+    "electron:gen-icons":"electron-icon-builder --input=./src/assets/GuestLianglogo.svg --output=build --flatten",
+    "electron:build-win": "electron-builder --win",
+    "electron:build-linux": "electron-builder --linux"
   },
   "dependencies": {
     "@types/crypto-js": "^4.2.2",
     "crypto-js": "^4.2.0",
+    "electron-icon-builder": "^2.0.1",
     "electron-store": "^10.0.1",
     "element-plus": "^2.8.7",
     "i18next": "^24.2.2",
@@ -84,7 +88,8 @@
       "target": [
         "nsis",
         "zip"
-      ]
+      ],
+      "icon": "public/GuestLianglogo.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -102,7 +107,8 @@
           ]
         }
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "icon": "src/assets/GuestLianglogo.png"
     }
   },
   "pnpm": {

@@ -197,6 +197,12 @@ const beforeUpload = (file: File) => {
   align-items: center;
   border: 2px dashed #409eff;
   border-radius: 10px;
+  transition: border 0.3s ease;
+}
+
+.el-upload-dragger:hover {
+  border: 2px solid #409eff;
+  background-color: #e2eaf7;
 }
 
 .el-upload-dragger .el-upload__text {

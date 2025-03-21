@@ -2,7 +2,7 @@
   <div class="common-layout">
     <el-container>
       <el-aside>
-        <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="75" height="75" />
+        <img alt="Guest Liang logo" class="logo" src="@/assets/GuestLianglogo.svg" width="130" height="130" />
         <div class="wrapper">
           <el-button @click="showHome" type="primary" plain>{{ $t('Navigation.Home') }}</el-button>
           <el-button @click="showEncryption" type="primary" plain>{{ $t('Navigation.Encryption') }}</el-button>
@@ -103,7 +103,7 @@ const showTools = () => {
 .wrapper {
   display: grid;
   flex-direction: column;
-  margin-top: 2rem;
+  margin-top: 0;
 }
 
 .el-button {
