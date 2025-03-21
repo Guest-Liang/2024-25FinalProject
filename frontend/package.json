@@ -1,6 +1,6 @@
 {
   "name": "guestliang-electron-app",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "main": "src/electron/main.mjs",
@@ -20,7 +20,7 @@
     "lint": "run-s lint:*",
     "format": "prettier --write src/",
     "fix": "electron-fix start",
-    "electron:gen-icons":"electron-icon-builder --input=./src/assets/GuestLianglogo.svg --output=build --flatten",
+    "electron:gen-icons": "electron-icon-builder --input=./src/assets/GuestLianglogo.svg --output=build --flatten",
     "electron:build-win": "electron-builder --win",
     "electron:build-linux": "electron-builder --linux"
   },
