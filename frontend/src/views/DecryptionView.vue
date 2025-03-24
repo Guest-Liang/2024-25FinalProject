@@ -162,12 +162,6 @@ const beforeUpload = (file: File) => {
 }
 
 const uploadFiles = async () => {
-  loading = ElLoading.service({
-    target: '.upload-container',
-    lock: true,
-    text: Keys.LoadingText,
-    background: 'rgba(0, 0, 0, 0.6)',
-  })
 
   const RawCustomImageList = toRaw(customImageList.value)
   if (customImageList.value.length === 0) {
@@ -177,9 +171,15 @@ const uploadFiles = async () => {
       type: 'warning',
       duration: 5000,
     })
-    loading.close()
     return
   }
+
+  loading = ElLoading.service({
+    target: '.upload-container',
+    lock: true,
+    text: Keys.LoadingText,
+    background: 'rgba(0, 0, 0, 0.6)',
+  })
 
   const formData = new FormData()
   RawCustomImageList.forEach((file) => {

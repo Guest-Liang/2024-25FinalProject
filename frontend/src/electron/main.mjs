@@ -168,7 +168,11 @@ function createWindow() {
   }
 
   console.log('[createWindow] Waiting window starting...')
-  startDjangoServer()
+  if (isDev) {
+    console.log('[createWindow] Dev mode, remember run backend manually.')
+  } else {
+    startDjangoServer()
+  }
 
   updateMenu() // 初始化菜单
   setupContextMenu() // 右键菜单
@@ -324,8 +328,12 @@ app.whenReady().then(() => {
       djangoProcess.kill()
       console.log('[before-quit] Django backend process killed.')
     }
-    killDjangoProcess()
-    console.log('[before-quit] Django process killed.')
+    if (isDev) {
+      console.log('[before-quit] Development mode, no need to kill Django process.')
+    } else {
+      killDjangoProcess()
+      console.log('[before-quit] Django process killed.')
+    }
   })
 
   app.on('activate', () => {

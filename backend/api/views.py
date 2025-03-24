@@ -15,6 +15,7 @@ class DecryptView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
+        logger.info(f"Receive Post Request in Decryption, Start processing. Data Body: {request.data}")
         # Check if file is provided
         if 'file' not in request.data and 'file[]' not in request.data:
             return CustomResponse(error="No file provided", status=status.HTTP_400_BAD_REQUEST)
@@ -55,6 +56,8 @@ class DecryptView(APIView):
             
             os.remove(FilePath)
         
+        logger.info("File decrypted successfully. End of processing.")
+
         return CustomResponse(results=Results, message="File decrypted successfully", status=status.HTTP_200_OK)
 
 
@@ -62,6 +65,8 @@ class EncryptView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
+        logger.info(f"Receive Post Request in Encryption, Start processing. Data Body: {request.data}")
+
         isUseCustomImg = request.data.get('isUseCustomImg')
         CustomImgPath = os.path.join(settings.TRANSIT_DIR, 'custom.png')
         EmailAddress = request.data.get('EmailAddress')
@@ -113,12 +118,18 @@ class EncryptView(APIView):
 
         if os.path.exists(CustomImgPath):
             os.remove(CustomImgPath)
+
         if EmailAddress:
             try:
+                logger.info("Start sending email...")
                 Email.SendEmailWithAttachment(EmailAddress, file_paths=OutputImagePaths)
+                logger.info("Email sent successfully.")
             except Exception as e:
                 logger.error(f"Failed to send email: {e}")
                 return CustomResponse(error="Failed to send email: " + str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        logger.info("File encrypted and saved. " + ('' if EmailAddress is None else "Email successfully sent. ") + 'End of processing.')
+
         return CustomResponse(results=Results,
                               message="File encrypted and saved, Email successfully sent." if EmailAddress is not None else "File encrypted and saved.", 
                               status=status.HTTP_200_OK
@@ -127,6 +138,8 @@ class EncryptView(APIView):
     
 class DownloadView(APIView):
     def get(self, request, file_name):
+        logger.info(f"Receive Get Request in Download, Start processing. Data Body: {request.data}")
+
         FilePath = os.path.join(settings.TRANSIT_DIR, file_name)
 
         if os.path.exists(FilePath):
@@ -134,17 +147,21 @@ class DownloadView(APIView):
             content_type, _ = mimetypes.guess_type(FilePath)
             response = FileResponse(open(FilePath, 'rb'), content_type=content_type)
             response['Content-Disposition'] = f'attachment; filename="{urllib.parse.quote(file_name)}"'
+            logger.info("File downloaded successfully. End of processing.")
             return response
         else:
-            logger.error(f"File not found: {FilePath}")
+            logger.error(f"File not found: {FilePath}. End of processing.")
             return CustomResponse(error="File not found", status=status.HTTP_404_NOT_FOUND)
 
 
 class EchoView(APIView):
     def post(self, request, *args, **kwargs):
+        logger.info(f"Receive Post Request in Echo, Start processing. Data Body: {request.data}")
         InputText = request.data.get('text', None)
         if InputText is None:
+            logger.error("No text provided. End of processing.")
             return Response({"error": "No text provided"}, status=status.HTTP_400_BAD_REQUEST)
         ReversedText = InputText[::-1]
+        logger.info(f"Text reversed sent. End of processing.")
         return Response({"Original Text": InputText, "Reversed Text": ReversedText}, status=status.HTTP_200_OK)
     

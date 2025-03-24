@@ -155,6 +155,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 # logging settings
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(filename)s | %(module)s | %(message)s',
+    format='%(asctime)s.%(msecs)d - %(filename)s | %(module)s | %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
 )
