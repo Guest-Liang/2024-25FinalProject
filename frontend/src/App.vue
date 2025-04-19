@@ -4,10 +4,10 @@
       <el-aside>
         <img alt="Guest Liang logo" class="logo" src="@/assets/GuestLianglogo.svg" width="130" height="130" />
         <div class="wrapper">
-          <el-button @click="showHome" type="primary" plain>{{ $t('Navigation.Home') }}</el-button>
-          <el-button @click="showEncryption" type="primary" plain>{{ $t('Navigation.Encryption') }}</el-button>
-          <el-button @click="showDecryption" type="primary" plain>{{ $t('Navigation.Decryption') }}</el-button>
-          <el-button @click="showTools" type="primary" plain>{{ $t('Navigation.Tools') }}</el-button>
+          <el-button @click="showHome" type="primary" :plain="selectedPage !== 'Home'">{{ $t('Navigation.Home') }}</el-button>
+          <el-button @click="showEncryption" type="primary" :plain="selectedPage !== 'Encryption'">{{ $t('Navigation.Encryption') }}</el-button>
+          <el-button @click="showDecryption" type="primary" :plain="selectedPage !== 'Decryption'">{{ $t('Navigation.Decryption') }}</el-button>
+          <el-button @click="showTools" type="primary" :plain="selectedPage !== 'Tools'">{{ $t('Navigation.Tools') }}</el-button>
         </div>
       </el-aside>
 
