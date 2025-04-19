@@ -4,16 +4,16 @@
       <el-aside>
         <img alt="Guest Liang logo" class="logo" src="@/assets/GuestLianglogo.svg" width="130" height="130" />
         <div class="wrapper">
-          <el-button @click="showHome" type="primary" :plain="selectedPage !== 'Home'">{{ $t('Navigation.Home') }}</el-button>
-          <el-button @click="showEncryption" type="primary" :plain="selectedPage !== 'Encryption'">{{ $t('Navigation.Encryption') }}</el-button>
-          <el-button @click="showDecryption" type="primary" :plain="selectedPage !== 'Decryption'">{{ $t('Navigation.Decryption') }}</el-button>
-          <el-button @click="showTools" type="primary" :plain="selectedPage !== 'Tools'">{{ $t('Navigation.Tools') }}</el-button>
+          <el-button @click="showHome" type="primary" :plain="selectedPage !== 'Home'">{{ t('Navigation.Home') }}</el-button>
+          <el-button @click="showEncryption" type="primary" :plain="selectedPage !== 'Encryption'">{{ t('Navigation.Encryption') }}</el-button>
+          <el-button @click="showDecryption" type="primary" :plain="selectedPage !== 'Decryption'">{{ t('Navigation.Decryption') }}</el-button>
+          <el-button @click="showTools" type="primary" :plain="selectedPage !== 'Tools'">{{ t('Navigation.Tools') }}</el-button>
         </div>
       </el-aside>
 
       <el-container class="inner-el-container">
         <el-header>
-          <Header :cusheader="$t(`Navigation.${selectedPage}`)"> </Header>
+          <Header :cusheader="t(`Navigation.${selectedPage}`)"> </Header>
         </el-header>
         <el-main>
           <component :is="currentComponent" />
@@ -28,7 +28,9 @@
 </template>
 
 <script setup lang="ts">
-import i18next from 'i18next'
+import { useTranslation } from 'i18next-vue'
+const { t, i18next } = useTranslation()
+
 onMounted(() => {
   console.log('[Vue] onMounted, checking window.electron:', window.electron) // 检查 window.electron 是否存在
 
@@ -94,8 +96,8 @@ const showTools = () => {
 .el-aside {
   text-align: center;
   height: calc(100% - 90px);
-  width: 12%;
-  min-width: 130px;
+  width: 15%;
+  min-width: 150px;
   position: fixed;
   z-index: 5;
 }
@@ -116,7 +118,7 @@ const showTools = () => {
 }
 
 .inner-el-container {
-  margin-left: max(calc(12% + 20px), calc(130px + 10px));
+  margin-left: max(calc(15% + 20px), calc(150px + 10px)); /* 和.el-aside的width\min-width保持一致*/
   flex-direction: column;
   height: calc(100vh - 90px);
 }

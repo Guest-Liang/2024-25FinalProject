@@ -129,8 +129,8 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1280,
     height: 720,
-    minWidth: 500,
-    minHeight: 300,
+    minWidth: 700,
+    minHeight: 500,
     icon: path.join(__dirname, '../assets/GuestLianglogo.png'),
     webPreferences: {
       preload: preloadPath,

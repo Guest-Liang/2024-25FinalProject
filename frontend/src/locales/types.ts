@@ -29,6 +29,7 @@ export interface I18nSchema {
     ColumnLabel_Hash: string
     LoadingText: string
     ErrorText: string
+    NoneFileMsg: string
   }
   EncryptView: {
     FileUploadText_nofile: string

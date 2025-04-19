@@ -3,7 +3,6 @@
     <div class="file-container">
       <el-upload
         action=""
-        :key="Keys.Upload"
         class="upload-component"
         :drag="true"
         multiple
@@ -15,8 +14,8 @@
         accept="*"
       >
         <i class="el-icon-upload"></i>
-        <div class="el-upload__text">{{ $t('ToolsView.UploadText') }}</div>
-        <div class="el-upload__tip">{{ $t('ToolsView.UploadTips') }}</div>
+        <div class="el-upload__text">{{ t('ToolsView.UploadText') }}</div>
+        <div class="el-upload__tip">{{ t('ToolsView.UploadTips') }}</div>
       </el-upload>
 
       <div
@@ -25,7 +24,6 @@
       >
         <el-button
           type="primary"
-          :key="Keys.CalcHash"
           round
           @click="calculateHash"
           style="
@@ -36,11 +34,10 @@
             word-wrap: break-word;
           "
         >
-          {{ $t('ToolsView.CalcHashButton') }}
+          {{ t('ToolsView.CalcHashButton') }}
         </el-button>
         <el-button
           type="danger"
-          :key="Keys.CleanFile"
           round
           @click="cleanUploadFiles"
           style="
@@ -52,46 +49,38 @@
             word-wrap: break-word;
           "
         >
-          {{ $t('ToolsView.CleanFileButton') }}
+          {{ t('ToolsView.CleanFileButton') }}
         </el-button>
       </div>
     </div>
 
     <div class="hash-table-container" v-if="hashResults.length > 0">
       <el-table :data="hashResults" border stripe>
-        <el-table-column prop="fileName" :label="$t('ToolsView.ColumnLabel_Name')" min-width="30%" />
-        <el-table-column prop="hash" :label="$t('ToolsView.ColumnLabel_Hash')" min-width="70%" />
+        <el-table-column prop="fileName" :label="t('ToolsView.ColumnLabel_Name')" min-width="30%" />
+        <el-table-column prop="hash" :label="t('ToolsView.ColumnLabel_Hash')" min-width="70%" />
       </el-table>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
+import { ref, watch } from 'vue'
 import CryptoJS from 'crypto-js'
 import { ElLoading, ElMessage } from 'element-plus'
-import i18next from 'i18next'
+
+import { useTranslation } from 'i18next-vue'
+const { t, i18next } = useTranslation()
 
 let loading = null
 
-const Keys = reactive({
-  Upload: 0,
-  CalcHash: 0,
-  CleanFile: 0,
-  LoadingText: i18next.t('ToolsView.LoadingText'),
-  ErrorText: i18next.t('ToolsView.ErrorText'),
-})
-
-watch(() => i18next.language, () => {
-  Object.keys(Keys).forEach((key) => {
-    Keys[key]++
-  })
-  Keys.LoadingText = i18next.t('ToolsView.LoadingText')
-  if (loading) {
-    loading.setText(i18next.t('ToolsView.LoadingText'))
+watch(
+  () => i18next.language,
+  () => {
+    if (loading) {
+      loading.setText(t('DecryptView.LoadingText'))
+    }
   }
-  Keys.ErrorText = i18next.t('ToolsView.ErrorText')
-})
+)
 
 const fileList = ref<File[]>([])
 const hashResults = ref<{ fileName: string; hash: string; raw: File }[]>([])
@@ -106,20 +95,24 @@ const cleanUploadFiles = () => {
 }
 
 const calculateHash = async () => {
-  loading = ElLoading.service({
-    target: '.tools',
-    lock: true,
-    text: i18next.t('ToolsView.LoadingText'),
-    background: 'rgba(0, 0, 0, 0.6)',
-  })
+  if ( hashResults.value.length === 0 ) {
+    ElMessage.error(t('ToolsView.NoneFileMsg'))
+    return
+  } else {
+    loading = ElLoading.service({
+      target: '.tools',
+      lock: true,
+      text: t('ToolsView.LoadingText'),
+      background: 'rgba(0, 0, 0, 0.6)',
+    })
 
-  for (let i = 0; i < hashResults.value.length; i++) {
-    const file = hashResults.value[i]
-    const hash = await getFileHash(file.raw)
-    hashResults.value[i].hash = hash
+    for (let i = 0; i < hashResults.value.length; i++) {
+      const file = hashResults.value[i]
+      const hash = await getFileHash(file.raw)
+      hashResults.value[i].hash = hash
+    }
+    loading.close()
   }
-
-  loading.close()
 }
 
 const getFileHash = (file: File): Promise<string> => {
@@ -139,7 +132,7 @@ const getFileHash = (file: File): Promise<string> => {
 const beforeUpload = (file: File) => {
   const isValidSize = file.size / 1024 / 1024 < 10 // 限制 10MB
   if (!isValidSize) {
-    ElMessage.error(Keys.ErrorText)
+    ElMessage.error(t('ToolsView.ErrorText'))
   }
   return isValidSize
 }

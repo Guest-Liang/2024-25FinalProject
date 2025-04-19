@@ -91,9 +91,9 @@ if PlatformArg in Platforms:
     args = [
         'manage.py',
         f'--name={CONFIG.API.FileName}',
-        '--onefile',            # Single executable file
-        '--console',            # Console output
-        '--noconfirm',          # Automatic confirmation, ignore all prompts
+        '--onefile',                                            # Single executable file
+        '--noconsole' if PlatformArg == 'win' else '--console', # Console or noconsole output
+        '--noconfirm',                                          # Automatic confirmation, ignore all prompts
         '--hidden-import=django.contrib.admin',
         '--hidden-import=django.contrib.auth',
         '--hidden-import=django.contrib.contenttypes',

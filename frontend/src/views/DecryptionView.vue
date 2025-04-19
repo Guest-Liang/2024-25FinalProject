@@ -3,7 +3,6 @@
     <div class="upload-container">
       <el-upload
         action=""
-        :key="Keys.FileUpload"
         class="upload-component"
         :drag="true"
         multiple
@@ -19,12 +18,12 @@
         <div class="el-upload__text">
           {{
             customImageList.length === 0
-              ? $t('DecryptView.UploadText_nofile')
-              : $t('DecryptView.UploadText_hasfile')
+              ? t('DecryptView.UploadText_nofile')
+              : t('DecryptView.UploadText_hasfile')
           }}
         </div>
         <div v-if="customImageList.length === 0" class="el-upload__tip">
-          {{ $t('DecryptView.UploadTips') }}
+          {{ t('DecryptView.UploadTips') }}
         </div>
       </el-upload>
       <div
@@ -33,7 +32,6 @@
       >
         <el-button
           type="primary"
-          :key="Keys.UploadButton"
           round
           @click="uploadFiles"
           style="
@@ -44,11 +42,10 @@
             word-wrap: break-word;
           "
         >
-          {{ $t('DecryptView.UploadFileButton') }}
+          {{ t('DecryptView.UploadFileButton') }}
         </el-button>
         <el-button
           type="danger"
-          :key="Keys.CleanButton"
           round
           @click="cleanUploadFiles"
           style="
@@ -60,13 +57,13 @@
             word-wrap: break-word;
           "
         >
-          {{ $t('DecryptView.CleanFileButton') }}
+          {{ t('DecryptView.CleanFileButton') }}
         </el-button>
       </div>
     </div>
 
     <div v-if="downloadLinks.length > 0" class="DownloadLink">
-      <h2>{{ $t('DecryptView.DownloadLinks') }}</h2>
+      <h2>{{ t('DecryptView.DownloadLinks') }}</h2>
       <ul>
         <li v-for="(link, index) in downloadLinks" :key="index">
           <a :href="link.url" download>{{ link.name }}</a>
@@ -77,47 +74,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw, watch, reactive } from 'vue'
+import { ref, toRaw, watch } from 'vue'
 import { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 import type { DecryptResult, DownloadLink } from '@/types/interface'
 import { BACKEND_API } from '@/types/config'
 
-import i18next from 'i18next'
+import { useTranslation } from 'i18next-vue'
+const { t, i18next } = useTranslation()
 
 let loading = null
 
-const Keys = reactive({
-  FileUpload: 0,
-  UploadButton: 0,
-  CleanButton: 0,
-  ExceedMaxSizeMsg: i18next.t('DecryptView.ExceedMaxSizeMsg'),
-  NonePNGImageMsg: i18next.t('DecryptView.NonePNGImageMsg'),
-  LoadingText: i18next.t('DecryptView.LoadingText'),
-  NoFileUploadMsg: i18next.t('DecryptView.NoFileUploadMsg'),
-  WaitingText: i18next.t('DecryptView.WaitingText'),
-  SuccessTitle: i18next.t('DecryptView.SuccessTitle'),
-  OKText: i18next.t('DecryptView.OKText'),
-  ErrorText: i18next.t('DecryptView.ErrorText'),
-  ErrorTitle: i18next.t('DecryptView.ErrorTitle'),
-})
-
-watch(() => i18next.language, () => {
-  Object.keys(Keys).forEach((key) => {
-    Keys[key]++
-  })
-  Keys.ExceedMaxSizeMsg = i18next.t('DecryptView.ExceedMaxSizeMsg')
-  Keys.NonePNGImageMsg = i18next.t('DecryptView.NonePNGImageMsg')
-  Keys.LoadingText = i18next.t('DecryptView.LoadingText')
-  if (loading) {
-    loading.setText(i18next.t('DecryptView.LoadingText'))
+watch(
+  () => i18next.language,
+  () => {
+    if (loading) {
+      loading.setText(t('DecryptView.LoadingText'))
+    }
   }
-  Keys.NoFileUploadMsg = i18next.t('DecryptView.NoFileUploadMsg')
-  Keys.WaitingText = i18next.t('DecryptView.WaitingText')
-  Keys.SuccessTitle = i18next.t('DecryptView.SuccessTitle')
-  Keys.OKText = i18next.t('DecryptView.OKText')
-  Keys.ErrorText = i18next.t('DecryptView.ErrorText')
-  Keys.ErrorTitle = i18next.t('DecryptView.ErrorTitle')
-})
+)
 
 const downloadLinks = ref<DownloadLink[]>([])
 const customImageList = ref<File[]>([])
@@ -145,7 +119,7 @@ const beforeUpload = (file: File) => {
   if (!isValidSize) {
     ElMessage({
       showClose: true,
-      message: Keys.ExceedMaxSizeMsg,
+      message: t('DecryptView.ExceedMaxSizeMsg'),
       type: 'error',
       duration: 5000,
     })
@@ -153,7 +127,7 @@ const beforeUpload = (file: File) => {
   if (!isPNG) {
     ElMessage({
       showClose: true,
-      message: Keys.NonePNGImageMsg,
+      message: t('DecryptView.NonePNGImageMsg'),
       type: 'error',
       duration: 5000,
     })
@@ -167,7 +141,7 @@ const uploadFiles = async () => {
   if (customImageList.value.length === 0) {
     ElMessage({
       showClose: true,
-      message: Keys.NoFileUploadMsg,
+      message: t('DecryptView.NoFileUploadMsg'),
       type: 'warning',
       duration: 5000,
     })
@@ -177,7 +151,7 @@ const uploadFiles = async () => {
   loading = ElLoading.service({
     target: '.upload-container',
     lock: true,
-    text: Keys.LoadingText,
+    text: t('DecryptView.LoadingText'),
     background: 'rgba(0, 0, 0, 0.6)',
   })
 
@@ -187,7 +161,7 @@ const uploadFiles = async () => {
   })
 
   try {
-    loading.setText(Keys.WaitingText)
+    loading.setText(t('DecryptView.WaitingText'))
     const response = await fetch(`http://${BACKEND_API}/api/decrypt/`, {
       method: 'POST',
       body: formData,
@@ -202,21 +176,21 @@ const uploadFiles = async () => {
           url: `http://${BACKEND_API}/api/download/${fileName}`,
         }
       })
-      ElMessageBox.alert(data.message, Keys.SuccessTitle, {
-        confirmButtonText: Keys.OKText,
+      ElMessageBox.alert(data.message, t('DecryptView.SuccessTitle'), {
+        confirmButtonText: t('DecryptView.OKText'),
         type: 'success',
       })
     } else {
-      ElMessageBox.alert(Keys.ErrorText, Keys.ErrorTitle, {
-        confirmButtonText: Keys.OKText,
+      ElMessageBox.alert(t('DecryptView.ErrorText'), t('DecryptView.ErrorTitle'), {
+        confirmButtonText: t('DecryptView.OKText'),
         type: 'error',
       })
       console.error('Upload failed:', response)
     }
   } catch (error) {
     console.error('Upload error:', error)
-    ElMessageBox.alert(Keys.ErrorText, Keys.ErrorTitle, {
-      confirmButtonText: Keys.OKText,
+    ElMessageBox.alert(t('DecryptView.ErrorText'), t('DecryptView.ErrorTitle'), {
+      confirmButtonText: t('DecryptView.OKText'),
       type: 'error',
     })
   } finally {

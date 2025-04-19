@@ -3,7 +3,6 @@
     <div class="upload-container">
       <el-upload
         action=""
-        :key="Keys.FileUpload"
         class="upload-component"
         :drag="true"
         multiple
@@ -19,18 +18,17 @@
         <div class="el-upload__text">
           {{
             encryptFileName === null
-              ? $t('EncryptView.FileUploadText_nofile')
-              : $t('EncryptView.FileUploadText_hasfile')
+              ? t('EncryptView.FileUploadText_nofile')
+              : t('EncryptView.FileUploadText_hasfile')
           }}
         </div>
         <div class="el-upload__tip">
-          {{ encryptFileName === null ? $t('EncryptView.FileUploadTips_nofile') : $t('EncryptView.FileUploadTips_hasfile') }}
+          {{ encryptFileName === null ? t('EncryptView.FileUploadTips_nofile') : t('EncryptView.FileUploadTips_hasfile') }}
         </div>
       </el-upload>
 
       <el-upload
         action=""
-        :Key="Keys.CustomImage"
         class="upload-component"
         :drag="true"
         multiple
@@ -44,12 +42,12 @@
         :on-remove="handleCustomFileRemove"
       >
         <i class="el-icon-upload"></i>
-        <div class="el-upload__text">{{ customImageName || $t('EncryptView.CustomImageUploadText_nofile') }}</div>
+        <div class="el-upload__text">{{ customImageName || t('EncryptView.CustomImageUploadText_nofile') }}</div>
         <div class="el-upload__tip">
           {{
             customImageName === null
-              ? $t('EncryptView.CustomImageUploadTips_nofile')
-              : $t('EncryptView.CustomImageUploadTips_hasfile')
+              ? t('EncryptView.CustomImageUploadTips_nofile')
+              : t('EncryptView.CustomImageUploadTips_hasfile')
           }}
         </div>
       </el-upload>
@@ -58,23 +56,21 @@
     <div class="button-group">
       <el-button
         type="primary"
-        :key="Keys.UploadButton"
         round
         @click="uploadFiles"
       >
-        {{ $t('EncryptView.UploadFileButton') }}
+        {{ t('EncryptView.UploadFileButton') }}
       </el-button>
       <el-button
         type="danger"
-        :key="Keys.CleanButton"
         round
         @click="cleanUploadFiles"
         style="margin-left: 10px"
       >
-        {{ $t('EncryptView.CleanFileButton') }}
+        {{ t('EncryptView.CleanFileButton') }}
       </el-button>
       <el-divider direction="vertical" />
-      <span>{{ $t('EncryptView.GetbyEmail') }}</span>
+      <span>{{ t('EncryptView.GetbyEmail') }}</span>
       <el-switch
         v-model="isSendingEmail"
         class="ml-2"
@@ -89,12 +85,12 @@
         v-model="inputEmail"
         style="width: 240px; margin-left: 10px"
         clearable
-        :placeholder="$t('EncryptView.EmailPlaceholder')"
+        :placeholder="t('EncryptView.EmailPlaceholder')"
       />
     </div>
 
     <div v-if="downloadLinks.length > 0" class="DownloadLink">
-      <h2>{{ $t('EncryptView.DownloadLinks') }}</h2>
+      <h2>{{ t('EncryptView.DownloadLinks') }}</h2>
       <ul>
         <li v-for="(link, index) in downloadLinks" :key="index">
           <a :href="link.url" download>{{ link.name }}</a> —— {{ link.originalName }}
@@ -105,49 +101,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw, reactive, watch } from 'vue'
+import { ref, toRaw, watch } from 'vue'
 import { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 import type { EncryptResult, DownloadLink } from '@/types/interface'
 import { BACKEND_API } from '@/types/config'
-import i18next from 'i18next'
+
+import { useTranslation } from 'i18next-vue'
+const { t, i18next } = useTranslation()
 
 let loading = null
 
-const Keys = reactive({
-  FileUpload: 0,
-  CustomImage: 0,
-  UploadButton: 0,
-  CleanButton: 0,
-  ExceedMaxSizeMsg: i18next.t('EncryptView.ExceedMaxSizeMsg'),
-  NonePNGImageMsg: i18next.t('EncryptView.NonePNGImageMsg'),
-  NoFileUploadMsg: i18next.t('EncryptView.NoFileUploadMsg'),
-  InvalidEmailMsg: i18next.t('EncryptView.InvalidEmailMsg'),
-  LoadingText: i18next.t('EncryptView.LoadingText'),
-  WaitingText: i18next.t('EncryptView.WaitingText'),
-  ErrorText: i18next.t('EncryptView.ErrorText'),
-  SuccessTitle: i18next.t('EncryptView.SuccessTitle'),
-  ErrorTitle: i18next.t('EncryptView.ErrorTitle'),
-  OKText: i18next.t('EncryptView.OKText'),
-})
-
-watch(() => i18next.language, () => {
-  Object.keys(Keys).forEach((key) => {
-    Keys[key]++
-  })
-  Keys.ExceedMaxSizeMsg = i18next.t('EncryptView.ExceedMaxSizeMsg')
-  Keys.NonePNGImageMsg = i18next.t('EncryptView.NonePNGImageMsg')
-  Keys.NoFileUploadMsg = i18next.t('EncryptView.NoFileUploadMsg')
-  Keys.InvalidEmailMsg = i18next.t('EncryptView.InvalidEmailMsg')
-  Keys.LoadingText = i18next.t('EncryptView.LoadingText')
-  if (loading) {
-    loading.setText(i18next.t('EncryptView.LoadingText'))
+watch(
+  () => i18next.language,
+  () => {
+    if (loading) {
+      loading.setText(t('DecryptView.LoadingText'))
+    }
   }
-  Keys.WaitingText = i18next.t('EncryptView.WaitingText')
-  Keys.ErrorText = i18next.t('EncryptView.ErrorText')
-  Keys.SuccessTitle = i18next.t('EncryptView.SuccessTitle')
-  Keys.ErrorTitle = i18next.t('EncryptView.ErrorTitle')
-  Keys.OKText = i18next.t('EncryptView.OKText')
-})
+)
 
 const isSendingEmail = ref(false)
 const inputEmail = ref('')
@@ -204,7 +175,7 @@ const beforeUpload = (file: File) => {
   if (!isValidSize) {
     ElMessage({
       showClose: true,
-      message: Keys.ExceedMaxSizeMsg,
+      message: t('EncryptView.ExceedMaxSizeMsg'),
       type: 'error',
       duration: 5000,
     })
@@ -212,7 +183,7 @@ const beforeUpload = (file: File) => {
   if (!isPNG) {
     ElMessage({
       showClose: true,
-      message: Keys.NonePNGImageMsg,
+      message: t('EncryptView.NonePNGImageMsg'),
       type: 'error',
       duration: 5000,
     })
@@ -224,7 +195,7 @@ const uploadFiles = async () => {
   if (encryptFileList.value.length === 0) {
     ElMessage({
       showClose: true,
-      message: Keys.NoFileUploadMsg,
+      message: t('EncryptView.NoFileUploadMsg'),
       type: 'warning',
       duration: 5000,
     })
@@ -234,7 +205,7 @@ const uploadFiles = async () => {
   if (isSendingEmail.value && !isValidEmail(inputEmail.value)) {
     ElMessage({
       showClose: true,
-      message: Keys.InvalidEmailMsg,
+      message: t('EncryptView.InvalidEmailMsg'),
       type: 'error',
       duration: 5000,
     })
@@ -244,7 +215,7 @@ const uploadFiles = async () => {
   loading = ElLoading.service({
     target: '.upload-container',
     lock: true,
-    text: i18next.t('EncryptView.LoadingText'),
+    text: t('EncryptView.LoadingText'),
     background: 'rgba(0, 0, 0, 0.6)',
   })
 
@@ -265,7 +236,7 @@ const uploadFiles = async () => {
   }
 
   try {
-    loading.setText(i18next.t('EncryptView.WaitingText'))
+    loading.setText(t('EncryptView.WaitingText'))
     const response = await fetch(`http://${BACKEND_API}/api/encrypt/`, {
       method: 'POST',
       body: formData,
@@ -283,21 +254,21 @@ const uploadFiles = async () => {
           originalName: originalFile.name,
         }
       })
-      ElMessageBox.alert(data.message, Keys.SuccessTitle, {
-        confirmButtonText: Keys.OKText,
+      ElMessageBox.alert(data.message, t('EncryptView.SuccessTitle'), {
+        confirmButtonText: t('EncryptView.OKText'),
         type: 'success',
       })
     } else {
-      ElMessageBox.alert(data.error, Keys.ErrorTitle, {
-        confirmButtonText: Keys.OKText,
+      ElMessageBox.alert(data.error, t('EncryptView.ErrorTitle'), {
+        confirmButtonText: t('EncryptView.OKText'),
         type: 'error',
       })
       console.error('Upload failed:', data.error)
     }
   } catch (error) {
     console.error('Upload error:', error)
-    ElMessageBox.alert(Keys.ErrorText, Keys.ErrorTitle, {
-      confirmButtonText: Keys.OKText,
+    ElMessageBox.alert(t('EncryptView.ErrorText'), t('EncryptView.ErrorTitle'), {
+      confirmButtonText: t('EncryptView.OKText'),
       type: 'error',
     })
   } finally {

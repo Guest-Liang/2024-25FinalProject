@@ -28,7 +28,8 @@
     "ColumnLabel_Name": "文件名",
     "ColumnLabel_Hash": "SHA-256 哈希值",
     "LoadingText": "计算Hash中...",
-    "ErrorText": "自定义图片尺寸不得超过10MB"
+    "ErrorText": "自定义图片尺寸不得超过10MB",
+    "NoneFileMsg": "未选择文件进行计算!"
   },
   "EncryptView": {
     "FileUploadText_nofile": "选择需要加密的文件",
@@ -85,8 +86,8 @@
   },
   "Navigation": {
     "Home": "主页",
-    "Encryption": "加密",
-    "Decryption": "解密",
-    "Tools": "工具"
+    "Encryption": "加密页面",
+    "Decryption": "解密页面",
+    "Tools": "哈希计算工具"
   }
 }

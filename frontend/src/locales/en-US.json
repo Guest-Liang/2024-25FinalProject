@@ -28,7 +28,8 @@
     "ColumnLabel_Name": "File Name",
     "ColumnLabel_Hash": "SHA-256 Hash",
     "LoadingText": "Calculating hash...",
-    "ErrorText": "Custom image size cannot exceed 10MB"
+    "ErrorText": "Custom image size cannot exceed 10MB",
+    "NoneFileMsg": "No file selected for calculation!"
   },
   "EncryptView": {
     "FileUploadText_nofile": "Choose files that needs to be encrypted",
@@ -85,8 +86,8 @@
   },
   "Navigation": {
     "Home": "Home",
-    "Encryption": "Encryption",
-    "Decryption": "Decryption",
-    "Tools": "Tools"
+    "Encryption": "Encryption Page",
+    "Decryption": "Decryption Page",
+    "Tools": "Hash Tools"
   }
 }
