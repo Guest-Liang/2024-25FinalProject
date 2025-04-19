@@ -3,9 +3,10 @@ import path from 'path'
 import { exec, spawn } from 'child_process'
 import iconv from 'iconv-lite'
 import fs from 'fs'
+import { fileURLToPath } from 'url'
 
-
-const __dirname = path.dirname(new URL(import.meta.url).pathname).slice(1)
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+console.log(`[main] __dirname: ${__dirname}`)
 
 let isDev = process.env.NODE_ENV === 'development'
 let win
@@ -19,17 +20,8 @@ let currentLanguage = 'en-US' // 默认语言
  * 读取 JSON 文件
  */
 function loadJsonFile(filename) {
-  let filePath
-  if (process.platform === 'win32') {
-    filePath = path.join(__dirname, `../locales/${filename}`)
-  } else if (process.platform === 'linux') {
-    filePath = path.normalize(path.join('/', __dirname, `../locales/${filename}`))
-    filePath = decodeURIComponent(filePath)
-  } else {
-    console.log('Unsupported platform.')
-    filePath = path.join(__dirname, `../locales/${filename}`)
-    exit(1)
-  }
+  console.log(`[loadJsonFile] Loading JSON file: ${filename}`)
+  const filePath = path.join(__dirname, '../locales', filename)
 
   try {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'))
@@ -73,18 +65,12 @@ function startDjangoServer() {
   if (process.platform === 'win32') {
     djangoExecutePath = path.join(
       __dirname,
-      isDev
-        ? '../../../backend/dist/windows/DjangoRestfulAPI.exe'
-        : '../../../APIDataDir/DjangoRestfulAPI.exe'
+      isDev ? '../backend/dist/windows/DjangoRestfulAPI.exe' : '../../../APIDataDir/DjangoRestfulAPI.exe'
     )
   } else if (process.platform === 'linux') {
-    djangoExecutePath = path.join(
-      isDev
-        ? path.normalize(path.join('/', __dirname, '../backend/dist/linux/'))
-        : path.normalize(path.join(path.dirname(process.argv[0]), 'resources/')),
-      'DjangoRestfulAPI'
-    )
-    djangoExecutePath = decodeURIComponent(djangoExecutePath)
+    djangoExecutePath = isDev
+      ? path.join(__dirname, '../backend/dist/linux', 'DjangoRestfulAPI')
+      : path.join(path.dirname(process.argv[0]), 'resources', 'DjangoRestfulAPI')
   } else {
     console.log('Unsupported platform.')
     exit(1)
@@ -134,21 +120,18 @@ function startDjangoServer() {
  */
 function createWindow() {
   let preloadPath
-  if (process.platform === 'win32') {
+  if (process.platform === 'win32' || process.platform === 'linux') {
     preloadPath = path.join(__dirname, 'preload.mjs')
-  } else if (process.platform === 'linux') {
-    preloadPath = path.normalize(path.join('/', __dirname, 'preload.mjs'))
-    preloadPath = decodeURIComponent(preloadPath)
   } else {
     console.log('Unsupported platform.')
-    exit(1)
+    process.exit(1)
   }
   win = new BrowserWindow({
     width: 1280,
     height: 720,
     minWidth: 500,
     minHeight: 300,
-    icon: path.normalize(path.join(process.platform === 'linux'? '/': '', __dirname, '../assets/GuestLianglogo.png')),
+    icon: path.join(__dirname, '../assets/GuestLianglogo.png'),
     webPreferences: {
       preload: preloadPath,
       devTools: true,
